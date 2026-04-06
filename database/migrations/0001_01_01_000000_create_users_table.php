@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('phone')->nullable();
-            $table->foreignId('district_id')->nullable()->constrained()->nullOnDelete();
-            $table->foreignId('ulb_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('district_id')->nullable();
+            $table->foreignId('ulb_id')->nullable();
             $table->string('district_name')->nullable();
             $table->string('ulb_name')->nullable();
             $table->string('email')->unique();
