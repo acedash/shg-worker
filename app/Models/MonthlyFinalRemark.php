@@ -14,6 +14,14 @@ class MonthlyFinalRemark extends Model
         'user_id',
         'report_month',
         'remark',
+        'source_segregation',
+        'home_composting',
+        'swm_infrastructure_functionality',
+        'rrr_centre_awareness',
+        'public_grievance_redressal',
+        'change_in_public_behavior',
+        'overall_improvement',
+        'other_feedback',
     ];
 
     protected function casts(): array

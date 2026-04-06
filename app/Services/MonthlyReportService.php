@@ -14,46 +14,48 @@ class MonthlyReportService
     public static function metricLabels(): array
     {
         return [
-            'households_visited' => 'Households visited',
-            'households_started_segregation' => 'Households started waste segregation',
-            'households_started_home_composting' => 'Households started home composting',
-            'open_burning_issues_found' => 'Open burning issues found',
-            'gvp_points_found' => 'Garbage vulnerable points found',
-            'illegal_dumping_points_found' => 'Illegal dumping points found',
-            'cd_waste_points_found' => 'C&D waste points found',
-            'littering_points_found' => 'Littering points found',
-            'open_defecation_points_found' => 'Open defecation points found',
-            'yellow_red_spots_found' => 'Yellow/red spots found',
-            'polluted_water_bodies_found' => 'Polluted water bodies found',
-            'complaints_resolved' => 'Complaints resolved',
-            'swm_assets_visited' => 'SWM assets visited',
-            'non_functional_assets_made_functional' => 'Non-functional assets made functional',
-            'toilets_visited' => 'CT/PT/Aspirational toilets visited',
-            'toilet_issues_reported' => 'Toilet issues reported',
-            'toilet_issues_resolved' => 'Toilet issues resolved',
-            'institutions_visited' => 'Institutions visited',
-            'institutions_started_composting' => 'Institutions started pit/drum composting',
-            'religious_places_visited' => 'Religious places visited',
-            'religious_places_with_separate_bins' => 'Religious places with separate bins',
-            'religious_places_with_composting' => 'Religious places with pit/drum composting',
-            'transit_locations_visited' => 'Transit locations visited',
-            'transit_locations_with_gvp' => 'Transit locations with GVP found',
-            'gvp_removed' => 'GVP removed',
-            'yellow_red_spots_identified' => 'Yellow/red spots identified',
-            'yellow_red_spots_removed' => 'Yellow/red spots removed',
-            'households_sensitized_rrr' => 'Households sensitized about RRR centre',
+            'households_visited' => 'No. of Households Visited',
+            'commercial_shops_visited' => 'No. of Commercial Shops Visited',
+            'institutions_visited' => 'No. of Public and Private Institutions Visited',
+            'religious_places_visited' => 'No. of Religious Places Visited',
+            'transit_locations_visited' => 'No. of Transit Locations Visited',
+            'toilets_visited' => 'No. of CT/PT/Aspirational Toilets Visited',
+            'swm_assets_visited' => 'No. of SWM Assets Visited',
+            'open_burning_issues_found' => 'No. of Open Burning of Garbage Points Found',
+            'gvp_points_found' => 'No. of Garbage Vulnerable Points (GVP) Found',
+            'illegal_dumping_points_found' => 'No. of Illegal Dumping Points Found',
+            'cd_waste_points_found' => 'No. of C&D Waste Points Found',
+            'littering_points_found' => 'No. of Littering Points Found',
+            'open_defecation_points_found' => 'No. of Open Defecation Points Found',
+            'yellow_red_spots_found' => 'No. of Yellow/Red Spots Found',
+            'polluted_water_bodies_found' => 'No. of Polluted Water Bodies Found',
+            'complaints_received' => 'No. of complaints received from residents about SWM issues',
         ];
     }
 
     public static function sections(): array
     {
         return [
-            'Door to Door IEC & Segregation Promotion' => [
+            'Household & Shops' => [
                 'households_visited',
-                'households_started_segregation',
-                'households_started_home_composting',
+                'commercial_shops_visited',
             ],
-            'SWM Issues Identified and Reporting' => [
+            'Institution & Bulk Waste Generators (BWG)' => [
+                'institutions_visited',
+            ],
+            'Religious Places' => [
+                'religious_places_visited',
+            ],
+            'Transit Locations' => [
+                'transit_locations_visited',
+            ],
+            'CT/PT/Aspirational Toilets' => [
+                'toilets_visited',
+            ],
+            'Solid Waste Management (SWM) Assets / Infrastructure' => [
+                'swm_assets_visited',
+            ],
+            'SWM Issues' => [
                 'open_burning_issues_found',
                 'gvp_points_found',
                 'illegal_dumping_points_found',
@@ -63,37 +65,23 @@ class MonthlyReportService
                 'yellow_red_spots_found',
                 'polluted_water_bodies_found',
             ],
-            'Public Grievance Redressal' => [
-                'complaints_resolved',
+            'Public Grievances' => [
+                'complaints_received',
             ],
-            'Monitoring of SWM Infrastructure' => [
-                'swm_assets_visited',
-                'non_functional_assets_made_functional',
-            ],
-            'Monitoring of CT/PT/Aspirational Toilets' => [
-                'toilets_visited',
-                'toilet_issues_reported',
-                'toilet_issues_resolved',
-            ],
-            'Institution & BWG IEC Awareness' => [
-                'institutions_visited',
-                'institutions_started_composting',
-            ],
-            'Religious Places IEC Awareness' => [
-                'religious_places_visited',
-                'religious_places_with_separate_bins',
-                'religious_places_with_composting',
-            ],
-            'Transit Location IEC Awareness' => [
-                'transit_locations_visited',
-                'transit_locations_with_gvp',
-                'gvp_removed',
-                'yellow_red_spots_identified',
-                'yellow_red_spots_removed',
-            ],
-            'Promotion of RRR Centre' => [
-                'households_sensitized_rrr',
-            ],
+        ];
+    }
+
+    public static function monthlyNarrativeLabels(): array
+    {
+        return [
+            'source_segregation' => 'Source Segregation',
+            'home_composting' => 'Home Composting',
+            'swm_infrastructure_functionality' => 'SWM Assets / Infrastructure Functionality',
+            'rrr_centre_awareness' => 'RRR Centre Awareness & Utilization',
+            'public_grievance_redressal' => 'Public Grievance Redressal',
+            'change_in_public_behavior' => 'Change in Public Behavior',
+            'overall_improvement' => 'Overall improvement in waste management and sanitation',
+            'other_feedback' => 'Any Other Feedback',
         ];
     }
 
@@ -143,13 +131,16 @@ class MonthlyReportService
             }
         }
 
+        $monthlyNarrative = $this->monthlyNarrativeValues($finalRemark);
+
         return [
             'user' => $user,
             'month' => $month,
             'activities' => $activities,
             'totals' => $totals,
             'submitted_days' => $activities->count(),
-            'final_remark' => $finalRemark?->remark,
+            'monthly_narrative' => $monthlyNarrative,
+            'final_remark' => $this->monthlyNarrativeText($monthlyNarrative),
         ];
     }
 
@@ -177,7 +168,13 @@ class MonthlyReportService
             fputcsv($handle, ['District', $report['user']->district_name]);
             fputcsv($handle, ['ULB', $report['user']->ulb_name]);
             fputcsv($handle, ['Month', $report['month']->format('F Y')]);
-            fputcsv($handle, ['Final Monthly Remark', $report['final_remark'] ?: '']);
+            fputcsv($handle, []);
+            fputcsv($handle, ['Monthly Progress Notes']);
+
+            foreach (self::monthlyNarrativeLabels() as $field => $label) {
+                fputcsv($handle, [$label, $report['monthly_narrative'][$field] ?: '']);
+            }
+
             fputcsv($handle, []);
             fputcsv($handle, ['Monthly Overview']);
             fputcsv($handle, ['Metric', 'Monthly Total']);
@@ -210,6 +207,7 @@ class MonthlyReportService
         return Pdf::loadView('reports.monthly-pdf', [
             'report' => $report,
             'metricLabels' => self::metricLabels(),
+            'monthlyNarrativeLabels' => self::monthlyNarrativeLabels(),
         ])->setPaper('a4')->download($filename);
     }
 
@@ -269,9 +267,43 @@ class MonthlyReportService
 
         if (filled($report['final_remark'] ?? null)) {
             $lines[] = '';
-            $lines[] = 'Final Monthly Remark: '.$report['final_remark'];
+            $lines[] = 'Monthly Progress Notes:';
+
+            foreach (self::monthlyNarrativeLabels() as $field => $label) {
+                if (filled($report['monthly_narrative'][$field] ?? null)) {
+                    $lines[] = $label.': '.$report['monthly_narrative'][$field];
+                }
+            }
         }
 
         return implode("\n", $lines);
+    }
+
+    private function monthlyNarrativeValues(?MonthlyFinalRemark $finalRemark): array
+    {
+        $values = [];
+
+        foreach (self::monthlyNarrativeLabels() as $field => $label) {
+            $values[$field] = $finalRemark?->{$field} ?? null;
+        }
+
+        if (! collect($values)->filter()->isNotEmpty() && filled($finalRemark?->remark)) {
+            $values['other_feedback'] = $finalRemark->remark;
+        }
+
+        return $values;
+    }
+
+    private function monthlyNarrativeText(array $monthlyNarrative): ?string
+    {
+        $lines = [];
+
+        foreach (self::monthlyNarrativeLabels() as $field => $label) {
+            if (filled($monthlyNarrative[$field] ?? null)) {
+                $lines[] = $label.': '.$monthlyNarrative[$field];
+            }
+        }
+
+        return $lines === [] ? null : implode("\n", $lines);
     }
 }

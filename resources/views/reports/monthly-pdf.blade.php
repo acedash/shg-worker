@@ -60,10 +60,23 @@
         </tbody>
     </table>
 
-    <h3 class="section-title">Final Monthly Remark</h3>
-    <div class="remark-box">
-        {{ $report['final_remark'] ?: 'No final monthly remark added.' }}
-    </div>
+    <h3 class="section-title">Monthly Progress Notes</h3>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Topic</th>
+                <th>Answer</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($monthlyNarrativeLabels as $field => $label)
+                <tr>
+                    <td>{{ $label }}</td>
+                    <td>{{ $report['monthly_narrative'][$field] ?: 'Not added.' }}</td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
 
     <h3 class="section-title">Day-wise Detailed Report</h3>
     @forelse ($report['activities'] as $activity)

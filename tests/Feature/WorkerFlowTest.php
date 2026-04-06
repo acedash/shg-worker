@@ -43,7 +43,8 @@ class WorkerFlowTest extends TestCase
         $submit = $this->post(route('worker.daily-activity.store'), [
             'activity_date' => '2026-04-02',
             'households_visited' => 10,
-            'complaints_resolved' => 2,
+            'commercial_shops_visited' => 3,
+            'complaints_received' => 2,
             'remarks' => 'Field visit completed.',
             'photos' => [
                 UploadedFile::fake()->image('proof-one.jpg'),
@@ -53,7 +54,8 @@ class WorkerFlowTest extends TestCase
         $submit->assertRedirect();
         $this->assertDatabaseHas('daily_activities', [
             'households_visited' => 10,
-            'complaints_resolved' => 2,
+            'commercial_shops_visited' => 3,
+            'complaints_received' => 2,
         ]);
 
         $activity = DailyActivity::first();
@@ -82,7 +84,7 @@ class WorkerFlowTest extends TestCase
             'user_id' => $worker->id,
             'activity_date' => '2026-04-02',
             'households_visited' => 8,
-            'complaints_resolved' => 1,
+            'complaints_received' => 1,
             'remarks' => 'Completed field visit.',
         ]);
 
@@ -116,7 +118,7 @@ class WorkerFlowTest extends TestCase
         $response->assertSeeText('Morning round done.');
     }
 
-    public function test_worker_can_save_final_monthly_remark_and_see_it_in_export(): void
+    public function test_worker_can_save_monthly_progress_and_see_it_in_export(): void
     {
         $worker = User::factory()->create([
             'role' => 'worker',
@@ -133,26 +135,29 @@ class WorkerFlowTest extends TestCase
 
         $saveResponse = $this->actingAs($worker)->post(route('worker.reports.monthly.final-remark'), [
             'month' => '2026-04',
-            'final_remark' => 'April work completed successfully.',
+            'source_segregation' => 'Segregation awareness improved in most households.',
+            'home_composting' => 'Two clusters started home composting.',
+            'other_feedback' => 'Need extra IEC material next month.',
         ]);
 
         $saveResponse->assertRedirect(route('worker.submissions', ['month' => '2026-04']));
         $this->assertDatabaseHas('monthly_final_remarks', [
             'user_id' => $worker->id,
-            'remark' => 'April work completed successfully.',
+            'source_segregation' => 'Segregation awareness improved in most households.',
+            'other_feedback' => 'Need extra IEC material next month.',
         ]);
 
         $exportResponse = $this->actingAs($worker)->get(route('worker.reports.monthly', ['month' => '2026-04']));
         $exportResponse->assertOk();
-        $this->assertStringContainsString('Final Monthly Remark', $exportResponse->streamedContent());
-        $this->assertStringContainsString('April work completed successfully.', $exportResponse->streamedContent());
+        $this->assertStringContainsString('Monthly Progress Notes', $exportResponse->streamedContent());
+        $this->assertStringContainsString('Segregation awareness improved in most households.', $exportResponse->streamedContent());
 
         $pdfResponse = $this->actingAs($worker)->get(route('worker.reports.monthly.pdf', ['month' => '2026-04']));
         $pdfResponse->assertOk();
         $this->assertSame('application/pdf', $pdfResponse->headers->get('content-type'));
     }
 
-    public function test_worker_can_update_existing_final_monthly_remark(): void
+    public function test_worker_can_update_existing_monthly_progress_report(): void
     {
         $worker = User::factory()->create([
             'role' => 'worker',
@@ -160,18 +165,20 @@ class WorkerFlowTest extends TestCase
 
         $this->actingAs($worker)->post(route('worker.reports.monthly.final-remark'), [
             'month' => '2026-04',
-            'final_remark' => 'First remark.',
+            'source_segregation' => 'First note.',
         ]);
 
         $updateResponse = $this->actingAs($worker)->post(route('worker.reports.monthly.final-remark'), [
             'month' => '2026-04',
-            'final_remark' => 'Updated remark.',
+            'source_segregation' => 'Updated note.',
+            'overall_improvement' => 'Ward cleanliness improved.',
         ]);
 
         $updateResponse->assertRedirect(route('worker.submissions', ['month' => '2026-04']));
         $this->assertDatabaseHas('monthly_final_remarks', [
             'user_id' => $worker->id,
-            'remark' => 'Updated remark.',
+            'source_segregation' => 'Updated note.',
+            'overall_improvement' => 'Ward cleanliness improved.',
         ]);
         $this->assertDatabaseCount('monthly_final_remarks', 1);
     }

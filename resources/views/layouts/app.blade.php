@@ -913,6 +913,13 @@
             border-radius: 16px;
             background: #fcfdff;
         }
+        .input-with-icon {
+            position: relative;
+            width: 100%;
+        }
+        .input-with-icon input {
+            padding-left: 38px;
+        }
         .form-toolbar {
             display: flex;
             justify-content: space-between;
@@ -1176,6 +1183,24 @@
             height: 100%;
             object-fit: cover;
             display: block;
+        }
+        .sticky-action-bar {
+            position: sticky;
+            bottom: 18px;
+            display: flex;
+            gap: 12px;
+            padding: 14px;
+            margin-top: 24px;
+            border: 1px solid #ebeff5;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-lg);
+            z-index: 20;
+        }
+        .sticky-action-bar .button {
+            flex: 1;
+            justify-content: center;
         }
         .submission-card {
             background: linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
@@ -1606,6 +1631,9 @@
             }
             .submissions-actions-inline {
                 grid-template-columns: 1fr;
+            }
+            .sticky-action-bar {
+                flex-direction: column;
             }
             .desktop-only {
                 display: none;

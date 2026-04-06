@@ -95,9 +95,7 @@ class WorkerDashboardController extends Controller
             'selectedMonth' => $selectedMonth,
             'activities' => $activities,
             'monthlyWhatsAppUrl' => route('worker.reports.monthly.whatsapp', ['month' => $selectedMonth->format('Y-m')]),
-            'finalRemark' => $request->user()->monthlyFinalRemarks()
-                ->whereDate('report_month', $selectedMonth->toDateString())
-                ->value('remark'),
+            'monthlyNarrative' => $this->reports->buildForUserMonth($request->user(), $selectedMonth)['monthly_narrative'],
         ]);
     }
 
@@ -167,34 +165,52 @@ class WorkerDashboardController extends Controller
     public function saveMonthlyFinalRemark(Request $request)
     {
         $selectedMonth = $this->resolveMonth($request->input('month'));
-        $validated = $request->validate([
-            'month' => ['required', 'date_format:Y-m'],
-            'final_remark' => ['required', 'string', 'max:3000'],
-        ], [
-            'final_remark.required' => 'Please add the final monthly remark before saving.',
-            'final_remark.max' => 'The final monthly remark must be 3000 characters or less.',
-        ]);
+        $rules = ['month' => ['required', 'date_format:Y-m']];
+        $messages = [];
+
+        foreach (MonthlyReportService::monthlyNarrativeLabels() as $field => $label) {
+            $rules[$field] = ['nullable', 'string', 'max:3000'];
+            $messages["{$field}.max"] = "{$label} must be 3000 characters or less.";
+        }
+
+        $validated = $request->validate($rules, $messages);
+        $narrativeValues = collect(MonthlyReportService::monthlyNarrativeLabels())
+            ->keys()
+            ->mapWithKeys(fn (string $field) => [$field => filled($validated[$field] ?? null) ? trim($validated[$field]) : null])
+            ->all();
+
+        if (! collect($narrativeValues)->filter()->isNotEmpty()) {
+            throw ValidationException::withMessages([
+                'source_segregation' => 'Please fill at least one monthly progress answer before saving.',
+            ]);
+        }
 
         $monthlyRemark = MonthlyFinalRemark::query()
             ->where('user_id', $request->user()->id)
             ->whereDate('report_month', $selectedMonth->toDateString())
             ->first();
 
+        $payload = [
+            ...$narrativeValues,
+            'remark' => collect(MonthlyReportService::monthlyNarrativeLabels())
+                ->map(fn (string $label, string $field) => filled($narrativeValues[$field]) ? $label.': '.$narrativeValues[$field] : null)
+                ->filter()
+                ->implode("\n"),
+        ];
+
         if ($monthlyRemark) {
-            $monthlyRemark->update([
-                'remark' => $validated['final_remark'],
-            ]);
+            $monthlyRemark->update($payload);
         } else {
             MonthlyFinalRemark::create([
                 'user_id' => $request->user()->id,
                 'report_month' => $selectedMonth->toDateString(),
-                'remark' => $validated['final_remark'],
+                ...$payload,
             ]);
         }
 
         return redirect()
             ->route('worker.submissions', ['month' => $selectedMonth->format('Y-m')])
-            ->with('status', 'Final monthly remark saved successfully.');
+            ->with('status', 'Monthly progress report saved successfully.');
     }
 
     private function validateActivity(Request $request): array
