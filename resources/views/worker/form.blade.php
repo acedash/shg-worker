@@ -25,7 +25,7 @@
     </div>
 
     <div class="form-layout-minimal">
-        <div class="card">
+        <div class="card" style="margin-bottom: 18px;">
             <div class="mini-stats-inline">
                 <div class="mini-stat">
                     <strong>{{ $selectedDate->format('d M Y') }}</strong>
@@ -58,7 +58,7 @@
             <input type="hidden" name="activity_date" value="{{ $selectedDate->format('Y-m-d') }}">
 
             @foreach ($sections as $sectionTitle => $fields)
-                <div class="card">
+                <div class="card" style="margin-bottom: 18px;">
                     <div class="section-head">
                         <div>
                             <h3>{{ $sectionTitle }}</h3>
@@ -79,7 +79,8 @@
                                     step="1"
                                     inputmode="numeric"
                                     name="{{ $field }}"
-                                    value="{{ old($field, $activity?->{$field} ?? 0) }}"
+                                    value="{{ old($field, (($activity?->{$field} ?? 0) > 0 ? $activity->{$field} : '')) }}"
+                                    placeholder="Enter count"
                                 >
                                 @error($field)
                                     <div class="field-error">{{ $message }}</div>
@@ -90,7 +91,7 @@
                 </div>
             @endforeach
 
-            <div class="card">
+            <div class="card" style="margin-bottom: 18px;">
                 <div class="section-head">
                     <div>
                         <h3>Proof Photos</h3>
@@ -113,15 +114,15 @@
                 @if (! empty($activity?->photo_paths))
                     <div class="photo-proof-grid" style="margin-top: 16px;">
                         @foreach ($activity->photo_paths as $photoPath)
-                            <a class="photo-proof-card" href="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($photoPath) }}" target="_blank" rel="noopener">
-                                <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($photoPath) }}" alt="Proof photo">
+                            <a class="photo-proof-card" href="{{ route('daily-activity.photos.show', ['activity' => $activity->id, 'photoIndex' => $loop->index]) }}" target="_blank" rel="noopener">
+                                <img src="{{ route('daily-activity.photos.show', ['activity' => $activity->id, 'photoIndex' => $loop->index]) }}" alt="Proof photo">
                             </a>
                         @endforeach
                     </div>
                 @endif
             </div>
 
-            <div class="card">
+            <div class="card" style="margin-bottom: 18px;">
                 <div class="section-head">
                     <div>
                         <h3>Daily Notes</h3>

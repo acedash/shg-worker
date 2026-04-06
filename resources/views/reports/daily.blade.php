@@ -75,8 +75,8 @@
                 @if (! empty($dailyReport['activity']->photo_paths))
                     <div class="photo-proof-grid">
                         @foreach ($dailyReport['activity']->photo_paths as $photoPath)
-                            <a class="photo-proof-card" href="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($photoPath) }}" target="_blank" rel="noopener">
-                                <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($photoPath) }}" alt="Uploaded proof photo">
+                            <a class="photo-proof-card" href="{{ route('daily-activity.photos.show', ['activity' => $dailyReport['activity']->id, 'photoIndex' => $loop->index]) }}" target="_blank" rel="noopener">
+                                <img src="{{ route('daily-activity.photos.show', ['activity' => $dailyReport['activity']->id, 'photoIndex' => $loop->index]) }}" alt="Uploaded proof photo">
                             </a>
                         @endforeach
                     </div>

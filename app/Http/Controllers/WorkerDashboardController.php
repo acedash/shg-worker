@@ -7,6 +7,7 @@ use App\Models\MonthlyFinalRemark;
 use App\Services\MonthlyReportService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 class WorkerDashboardController extends Controller
@@ -74,6 +75,20 @@ class WorkerDashboardController extends Controller
         ]);
     }
 
+    public function showPhoto(Request $request, DailyActivity $activity, int $photoIndex)
+    {
+        abort_if(! $request->user()->isAdmin() && $activity->user_id !== $request->user()->id, 404);
+
+        $photoPath = $activity->photo_paths[$photoIndex] ?? null;
+
+        abort_unless(is_string($photoPath) && filled($photoPath), 404);
+        abort_unless(Storage::disk('public')->exists($photoPath), 404);
+
+        return response()->file(Storage::disk('public')->path($photoPath), [
+            'Cache-Control' => 'public, max-age=86400',
+        ]);
+    }
+
     public function submissions(Request $request)
     {
         $selectedMonth = $this->resolveMonth($request->query('month'));
@@ -102,9 +117,10 @@ class WorkerDashboardController extends Controller
     public function store(Request $request)
     {
         $validated = $this->validateActivity($request);
+        $activityDate = Carbon::parse($validated['activity_date'])->toDateString();
         $existingActivity = DailyActivity::query()
             ->where('user_id', $request->user()->id)
-            ->whereDate('activity_date', $validated['activity_date'])
+            ->whereDate('activity_date', $activityDate)
             ->first();
         $photoPaths = $existingActivity?->photo_paths ?? [];
 
@@ -117,19 +133,20 @@ class WorkerDashboardController extends Controller
         DailyActivity::updateOrCreate(
             [
                 'user_id' => $request->user()->id,
-                'activity_date' => $validated['activity_date'],
+                'activity_date' => $activityDate,
             ],
             [
                 ...$validated,
                 'user_id' => $request->user()->id,
+                'activity_date' => $activityDate,
                 'photo_paths' => $photoPaths,
             ]
         );
 
         return redirect()
             ->route('worker.daily-activity.form', [
-                'date' => $validated['activity_date'],
-                'month' => Carbon::parse($validated['activity_date'])->format('Y-m'),
+                'date' => $activityDate,
+                'month' => Carbon::parse($activityDate)->format('Y-m'),
             ])
             ->with('status', 'Daily activity saved successfully.');
     }
@@ -215,8 +232,16 @@ class WorkerDashboardController extends Controller
 
     private function validateActivity(Request $request): array
     {
-        if (! $request->hasFile('photos')) {
+        $photoFiles = collect($request->file('photos', []))
+            ->filter(fn ($photo) => $photo !== null && $photo->isValid())
+            ->values()
+            ->all();
+
+        if ($photoFiles === []) {
+            $request->files->remove('photos');
             $request->request->remove('photos');
+        } else {
+            $request->files->set('photos', $photoFiles);
         }
 
         $rules = ['activity_date' => ['required', 'date', 'before_or_equal:today']];

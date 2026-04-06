@@ -19,6 +19,10 @@
         .day-card h4 { margin: 0 0 6px; font-size: 14px; }
         .day-meta { margin: 0 0 10px; color: #6b7280; }
         .muted { color: #6b7280; }
+        .photo-grid { margin-top: 10px; }
+        .photo-grid td { border: none; padding: 0 8px 8px 0; width: 110px; }
+        .photo-thumb { width: 100px; height: 100px; object-fit: cover; border: 1px solid #d1d5db; border-radius: 8px; }
+        .photo-note { margin: 8px 0 0; color: #6b7280; font-size: 11px; }
     </style>
 </head>
 <body>
@@ -100,6 +104,29 @@
                     @endforeach
                 </tbody>
             </table>
+
+            @if (! empty($activity->photo_paths))
+                <h4 class="section-title" style="font-size: 13px; margin-top: 12px;">Proof Photos</h4>
+                <table class="photo-grid">
+                    <tr>
+                        @foreach ($activity->photo_paths as $photoPath)
+                            @php
+                                $absolutePath = \Illuminate\Support\Facades\Storage::disk('public')->path($photoPath);
+                            @endphp
+                            @if (is_string($photoPath) && file_exists($absolutePath))
+                                <td>
+                                    <img class="photo-thumb" src="{{ $absolutePath }}" alt="Proof photo">
+                                </td>
+                                @if (($loop->iteration % 4) === 0 && ! $loop->last)
+                                    </tr><tr>
+                                @endif
+                            @endif
+                        @endforeach
+                    </tr>
+                </table>
+            @else
+                <p class="photo-note">No proof photos uploaded for this day.</p>
+            @endif
         </div>
     @empty
         <p class="muted">No daily entries found for this month.</p>

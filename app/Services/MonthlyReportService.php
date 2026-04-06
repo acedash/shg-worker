@@ -8,6 +8,7 @@ use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Storage;
 
 class MonthlyReportService
 {
@@ -189,6 +190,7 @@ class MonthlyReportService
             foreach ($report['activities'] as $activity) {
                 fputcsv($handle, ['Date', $activity->activity_date->format('d M Y')]);
                 fputcsv($handle, ['Remarks', $activity->remarks ?: 'No remarks added.']);
+                fputcsv($handle, ['Proof Photos', $this->csvPhotoSummary($activity)]);
                 fputcsv($handle, ['Metric', 'Daily Value']);
 
                 foreach (self::metricLabels() as $field => $label) {
@@ -305,5 +307,19 @@ class MonthlyReportService
         }
 
         return $lines === [] ? null : implode("\n", $lines);
+    }
+
+    private function csvPhotoSummary(DailyActivity $activity): string
+    {
+        if (empty($activity->photo_paths)) {
+            return 'No proof photos uploaded.';
+        }
+
+        return collect($activity->photo_paths)
+            ->filter(fn ($path) => is_string($path) && filled($path))
+            ->map(function (string $path): string {
+                return basename($path);
+            })
+            ->implode('; ');
     }
 }

@@ -355,6 +355,9 @@
         .button-icon {
             gap: 8px;
         }
+        .button-icon span {
+            min-width: 0;
+        }
         .button-primary, button.button-primary { background: var(--brand); color: #fff; }
         .button-secondary, button.button-secondary { background: #fff; border-color: var(--line); color: var(--text); }
         .hero, .card {
@@ -1265,7 +1268,7 @@
             width: 130px;
         }
         .submissions-table th:nth-child(4) {
-            width: 320px;
+            width: 360px;
         }
         .submissions-date-cell {
             vertical-align: middle;
@@ -1322,8 +1325,22 @@
         }
         .submissions-actions-inline {
             display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-template-columns: repeat(3, minmax(96px, 1fr));
             gap: 10px;
+        }
+        .submissions-actions-inline .button,
+        .submission-actions .button {
+            min-width: 0;
+            padding: 10px 12px;
+            font-size: 0.84rem;
+            justify-content: center;
+            white-space: nowrap;
+        }
+        .submissions-actions-inline .button-icon span,
+        .submission-actions .button-icon span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         .submissions-stack {
             gap: 14px;

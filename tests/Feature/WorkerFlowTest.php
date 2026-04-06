@@ -98,6 +98,31 @@ class WorkerFlowTest extends TestCase
         $this->assertStringContainsString('wa.me', $monthlyShareResponse->headers->get('Location'));
     }
 
+    public function test_worker_photo_is_served_through_application_route(): void
+    {
+        Storage::fake('public');
+
+        $worker = User::factory()->create([
+            'role' => 'worker',
+        ]);
+
+        Storage::disk('public')->put('daily-activity-proofs/test-proof.jpg', 'fake-image-content');
+
+        $activity = DailyActivity::create([
+            'user_id' => $worker->id,
+            'activity_date' => '2026-04-02',
+            'households_visited' => 2,
+            'photo_paths' => ['daily-activity-proofs/test-proof.jpg'],
+        ]);
+
+        $response = $this->actingAs($worker)->get(route('daily-activity.photos.show', [
+            'activity' => $activity->id,
+            'photoIndex' => 0,
+        ]));
+
+        $response->assertOk();
+    }
+
     public function test_worker_can_open_submissions_page(): void
     {
         $worker = User::factory()->create([
