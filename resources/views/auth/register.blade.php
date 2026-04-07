@@ -4,13 +4,13 @@
     <div class="auth-shell">
         <div class="card auth-card" style="max-width: 560px;">
             <h2 class="auth-title">Register</h2>
-            <p class="auth-subtitle">Create a clean worker account to start daily reporting.</p>
+            <p class="auth-subtitle">Create a clean Community Mobilizer account to start daily reporting.</p>
 
             <form method="POST" action="{{ route('register.submit') }}" class="stack">
                 @csrf
                 <div class="form-grid">
                     <div>
-                        <label for="name">Worker Name</label>
+                        <label for="name">Community Mobilizer Name</label>
                         <input id="name" class="@error('name') input-error @enderror" type="text" name="name" value="{{ old('name') }}" required>
                         @error('name')
                             <div class="field-error">{{ $message }}</div>
