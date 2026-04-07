@@ -27,6 +27,12 @@
         .question-block strong { display: block; margin-bottom: 6px; font-size: 12px; }
         .question-block p { margin: 0; color: #374151; line-height: 1.55; }
         .question-list { page-break-inside: auto; }
+        .signature-row { width: 100%; margin-top: 30px; page-break-inside: avoid; }
+        .signature-row td { width: 50%; vertical-align: bottom; padding-top: 30px; }
+        .signature-line { border-top: 1px solid #9ca3af; width: 220px; margin-bottom: 8px; }
+        .signature-label { font-size: 12px; font-weight: 600; color: #374151; }
+        .signature-right { text-align: right; }
+        .signature-right .signature-line { margin-left: auto; }
     </style>
 </head>
 <body>
@@ -127,5 +133,18 @@
     @empty
         <p class="muted">No daily entries found for this month.</p>
     @endforelse
+
+    <table class="signature-row">
+        <tr>
+            <td>
+                <div class="signature-line"></div>
+                <div class="signature-label">Signature Community Mobilizer</div>
+            </td>
+            <td class="signature-right">
+                <div class="signature-line"></div>
+                <div class="signature-label">Signature Nigran/Supervisor</div>
+            </td>
+        </tr>
+    </table>
 </body>
 </html>
