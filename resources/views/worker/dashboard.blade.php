@@ -5,7 +5,7 @@
         <div class="worker-dashboard-hero-grid">
             <div>
                 <span class="page-kicker">Monthly Overview</span>
-                <h2>Worker Dashboard</h2>
+                <h2>Community Mobilizer Dashboard</h2>
                 <p>Use this page to enter today&apos;s activity, review this month&apos;s progress, and open saved reports quickly.</p>
 
                 <div class="worker-dashboard-actions">

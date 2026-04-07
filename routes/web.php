@@ -33,6 +33,7 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/worker/daily-activity', [WorkerDashboardController::class, 'showForm'])->name('worker.daily-activity.form');
     Route::get('/worker/submissions', [WorkerDashboardController::class, 'submissions'])->name('worker.submissions');
     Route::get('/daily-activity-photos/{activity}/{photoIndex}', [WorkerDashboardController::class, 'showPhoto'])->name('daily-activity.photos.show');
+    Route::get('/daily-activity-documents/{activity}/{documentIndex}', [WorkerDashboardController::class, 'showDocument'])->name('daily-activity.documents.show');
     Route::post('/worker/daily-activity', [WorkerDashboardController::class, 'store'])->name('worker.daily-activity.store');
     Route::post('/worker/reports/monthly/final-remark', [WorkerDashboardController::class, 'saveMonthlyFinalRemark'])->name('worker.reports.monthly.final-remark');
     Route::get('/worker/reports/daily/{activity}', [WorkerDashboardController::class, 'showDailyReport'])->name('worker.reports.daily');

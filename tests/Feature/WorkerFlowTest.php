@@ -32,6 +32,7 @@ class WorkerFlowTest extends TestCase
             'phone' => '9876543210',
             'district_id' => $district->id,
             'ulb_id' => $ulb->id,
+            'assigned_ward' => 'Ward 12',
             'email' => 'worker@example.com',
             'password' => 'secret123',
             'password_confirmation' => 'secret123',
@@ -49,6 +50,9 @@ class WorkerFlowTest extends TestCase
             'photos' => [
                 UploadedFile::fake()->image('proof-one.jpg'),
             ],
+            'documents' => [
+                UploadedFile::fake()->create('field-note.pdf', 200, 'application/pdf'),
+            ],
         ]);
 
         $submit->assertRedirect();
@@ -60,7 +64,9 @@ class WorkerFlowTest extends TestCase
 
         $activity = DailyActivity::first();
         $this->assertNotEmpty($activity->photo_paths);
+        $this->assertNotEmpty($activity->document_paths);
         Storage::disk('public')->assertExists($activity->photo_paths[0]);
+        Storage::disk('public')->assertExists($activity->document_paths[0]);
     }
 
     public function test_admin_dashboard_requires_admin_role(): void

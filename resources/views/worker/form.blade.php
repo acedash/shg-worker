@@ -94,20 +94,34 @@
             <div class="card" style="margin-bottom: 18px;">
                 <div class="section-head">
                     <div>
-                        <h3>Proof Photos</h3>
-                        <p>Optional. Add up to 5 photos as supporting proof for the day.</p>
+                        <h3>Attachments</h3>
+                        <p>Optional. Add image attachments or document attachments for the day.</p>
                     </div>
                 </div>
 
-                <div class="subtle-panel">
+                <div class="subtle-panel" style="margin-bottom: 14px;">
+                    <label for="photos" style="display:block; margin-bottom: 8px;">Image Attachments</label>
                     <input id="photos" class="@error('photos') input-error @enderror @error('photos.*') input-error @enderror" type="file" name="photos[]" accept="image/*" multiple>
-                    <p class="muted" style="margin: 8px 0 0;">Photos are optional. Upload only if available. Max 4MB each.</p>
+                    <p class="muted" style="margin: 8px 0 0;">Optional. Upload up to 5 images. Max 4MB each.</p>
                 </div>
 
                 @error('photos')
                     <div class="field-error">{{ $message }}</div>
                 @enderror
                 @error('photos.*')
+                    <div class="field-error">{{ $message }}</div>
+                @enderror
+
+                <div class="subtle-panel">
+                    <label for="documents" style="display:block; margin-bottom: 8px;">Document Attachments</label>
+                    <input id="documents" class="@error('documents') input-error @enderror @error('documents.*') input-error @enderror" type="file" name="documents[]" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" multiple>
+                    <p class="muted" style="margin: 8px 0 0;">Optional. Upload up to 5 documents. PDF, DOC, DOCX, JPG, JPEG, PNG. Max 5MB each.</p>
+                </div>
+
+                @error('documents')
+                    <div class="field-error">{{ $message }}</div>
+                @enderror
+                @error('documents.*')
                     <div class="field-error">{{ $message }}</div>
                 @enderror
 
@@ -120,12 +134,23 @@
                         @endforeach
                     </div>
                 @endif
+
+                @if (! empty($activity?->document_paths))
+                    <div class="stack" style="margin-top: 16px;">
+                        @foreach ($activity->document_paths as $documentPath)
+                            <a class="button button-secondary button-icon" href="{{ route('daily-activity.documents.show', ['activity' => $activity->id, 'documentIndex' => $loop->index]) }}" target="_blank" rel="noopener" style="justify-content: flex-start;">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" /></svg>
+                                <span>{{ basename($documentPath) }}</span>
+                            </a>
+                        @endforeach
+                    </div>
+                @endif
             </div>
 
             <div class="card" style="margin-bottom: 18px;">
                 <div class="section-head">
                     <div>
-                        <h3>Daily Notes</h3>
+                        <h3>Work Daily Report</h3>
                         <p>Optional notes for any special activity, challenge, or follow-up.</p>
                     </div>
                 </div>
@@ -137,8 +162,8 @@
             </div>
 
             <div class="sticky-action-bar">
-                <button class="button button-primary" type="submit">Save Daily Report</button>
-                <a class="button button-secondary" href="{{ route('worker.dashboard', ['month' => $selectedMonth->format('Y-m')]) }}">Cancel</a>
+                <button class="button button-primary" type="submit" style="min-height: 42px; padding: 10px 16px; font-size: 0.92rem; font-weight: 500;">Save Daily Report</button>
+                <a class="button button-secondary" href="{{ route('worker.dashboard', ['month' => $selectedMonth->format('Y-m')]) }}" style="min-height: 42px; padding: 10px 16px; font-size: 0.92rem; font-weight: 500;">Cancel</a>
             </div>
         </form>
     </div>

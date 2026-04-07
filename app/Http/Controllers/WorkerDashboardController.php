@@ -89,6 +89,20 @@ class WorkerDashboardController extends Controller
         ]);
     }
 
+    public function showDocument(Request $request, DailyActivity $activity, int $documentIndex)
+    {
+        abort_if(! $request->user()->isAdmin() && $activity->user_id !== $request->user()->id, 404);
+
+        $documentPath = $activity->document_paths[$documentIndex] ?? null;
+
+        abort_unless(is_string($documentPath) && filled($documentPath), 404);
+        abort_unless(Storage::disk('public')->exists($documentPath), 404);
+
+        return response()->file(Storage::disk('public')->path($documentPath), [
+            'Cache-Control' => 'public, max-age=86400',
+        ]);
+    }
+
     public function submissions(Request $request)
     {
         $selectedMonth = $this->resolveMonth($request->query('month'));
@@ -123,10 +137,17 @@ class WorkerDashboardController extends Controller
             ->whereDate('activity_date', $activityDate)
             ->first();
         $photoPaths = $existingActivity?->photo_paths ?? [];
+        $documentPaths = $existingActivity?->document_paths ?? [];
 
         if ($request->hasFile('photos')) {
             foreach ($request->file('photos', []) as $photo) {
                 $photoPaths[] = $photo->store('daily-activity-proofs', 'public');
+            }
+        }
+
+        if ($request->hasFile('documents')) {
+            foreach ($request->file('documents', []) as $document) {
+                $documentPaths[] = $document->store('daily-activity-documents', 'public');
             }
         }
 
@@ -140,6 +161,7 @@ class WorkerDashboardController extends Controller
                 'user_id' => $request->user()->id,
                 'activity_date' => $activityDate,
                 'photo_paths' => $photoPaths,
+                'document_paths' => $documentPaths,
             ]
         );
 
@@ -244,16 +266,32 @@ class WorkerDashboardController extends Controller
             $request->files->set('photos', $photoFiles);
         }
 
+        $documentFiles = collect($request->file('documents', []))
+            ->filter(fn ($document) => $document !== null && $document->isValid())
+            ->values()
+            ->all();
+
+        if ($documentFiles === []) {
+            $request->files->remove('documents');
+            $request->request->remove('documents');
+        } else {
+            $request->files->set('documents', $documentFiles);
+        }
+
         $rules = ['activity_date' => ['required', 'date', 'before_or_equal:today']];
         $messages = [
             'activity_date.required' => 'Please select the activity date.',
             'activity_date.date' => 'Please choose a valid activity date.',
             'activity_date.before_or_equal' => 'Future dates are not allowed for daily activity entries.',
             'remarks.max' => 'Remarks must be 2000 characters or less.',
-            'photos.array' => 'Upload valid proof photos only.',
-            'photos.max' => 'You can upload up to 5 proof photos for one day.',
-            'photos.*.image' => 'Each proof file must be an image.',
+            'photos.array' => 'Upload valid attachments only.',
+            'photos.max' => 'You can upload up to 5 image attachments for one day.',
+            'photos.*.image' => 'Each image attachment must be an image.',
             'photos.*.max' => 'Each photo must be 4 MB or less.',
+            'documents.array' => 'Upload valid documents only.',
+            'documents.max' => 'You can upload up to 5 documents for one day.',
+            'documents.*.mimes' => 'Each document must be a PDF, DOC, DOCX, JPG, JPEG, or PNG file.',
+            'documents.*.max' => 'Each document must be 5 MB or less.',
         ];
 
         foreach (array_keys(MonthlyReportService::metricLabels()) as $field) {
@@ -266,6 +304,8 @@ class WorkerDashboardController extends Controller
         $rules['remarks'] = ['nullable', 'string', 'max:2000'];
         $rules['photos'] = ['sometimes', 'array', 'max:5'];
         $rules['photos.*'] = ['sometimes', 'image', 'max:4096'];
+        $rules['documents'] = ['sometimes', 'array', 'max:5'];
+        $rules['documents.*'] = ['sometimes', 'file', 'mimes:pdf,doc,docx,jpg,jpeg,png', 'max:5120'];
 
         $validated = $request->validate($rules, $messages);
 

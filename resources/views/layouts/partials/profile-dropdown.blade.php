@@ -1,10 +1,11 @@
 <div class="profile-menu">
+    @php($roleLabel = auth()->user()->role === 'worker' ? 'Community Mobilizer' : ucfirst(auth()->user()->role))
     <button class="user-chip profile-toggle" type="button" data-profile-toggle aria-expanded="false">
         <span class="user-avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
         @if (! empty($showMeta))
             <span class="user-meta">
                 <strong>{{ auth()->user()->name }}</strong>
-                <span>{{ ucfirst(auth()->user()->role) }}</span>
+                <span>{{ $roleLabel }}</span>
             </span>
         @endif
         <span class="profile-caret">▾</span>
@@ -12,7 +13,7 @@
     <div class="profile-dropdown" data-profile-dropdown>
         <div class="profile-dropdown-header">
             <strong>{{ auth()->user()->name }}</strong>
-            <span>{{ ucfirst(auth()->user()->role) }}</span>
+            <span>{{ $roleLabel }}</span>
         </div>
         @if (! empty($showMeta))
             <div class="profile-dropdown-note">

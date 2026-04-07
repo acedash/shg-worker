@@ -71,7 +71,7 @@
             </div>
 
             <div class="form-section">
-                <h4 class="section-title">Photo Proof</h4>
+                <h4 class="section-title">Attachments</h4>
                 @if (! empty($dailyReport['activity']->photo_paths))
                     <div class="photo-proof-grid">
                         @foreach ($dailyReport['activity']->photo_paths as $photoPath)
@@ -80,8 +80,21 @@
                             </a>
                         @endforeach
                     </div>
-                @else
-                    <p class="muted" style="margin: 0;">No proof photos uploaded for this day.</p>
+                @endif
+
+                @if (! empty($dailyReport['activity']->document_paths))
+                    <div class="stack" style="margin-top: 16px;">
+                        @foreach ($dailyReport['activity']->document_paths as $documentPath)
+                            <a class="button button-secondary button-icon" href="{{ route('daily-activity.documents.show', ['activity' => $dailyReport['activity']->id, 'documentIndex' => $loop->index]) }}" target="_blank" rel="noopener" style="justify-content: flex-start;">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" /></svg>
+                                <span>{{ basename($documentPath) }}</span>
+                            </a>
+                        @endforeach
+                    </div>
+                @endif
+
+                @if (empty($dailyReport['activity']->photo_paths) && empty($dailyReport['activity']->document_paths))
+                    <p class="muted" style="margin: 0;">No attachments uploaded for this day.</p>
                 @endif
             </div>
         </div>

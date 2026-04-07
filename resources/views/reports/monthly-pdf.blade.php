@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Monthly Report</title>
+    <title>Community Mobilizer Monthly Report</title>
     <style>
         body { font-family: DejaVu Sans, sans-serif; color: #111827; font-size: 12px; }
         h1, h2, h3 { margin: 0; }
@@ -13,7 +13,7 @@
         .meta-table td { padding: 6px 8px; border: 1px solid #d1d5db; }
         .data-table th, .data-table td { padding: 7px 8px; border: 1px solid #d1d5db; vertical-align: top; }
         .data-table th { background: #eff6ff; text-align: left; font-size: 11px; }
-        .section-title { margin-top: 18px; margin-bottom: 8px; font-size: 15px; }
+        .section-title { margin-top: 18px; margin-bottom: 8px; font-size: 15px; page-break-after: avoid; }
         .remark-box { border: 1px solid #d1d5db; padding: 10px; min-height: 44px; background: #f9fafb; }
         .day-card { margin-top: 18px; border: 1px solid #d1d5db; padding: 12px; page-break-inside: avoid; }
         .day-card h4 { margin: 0 0 6px; font-size: 14px; }
@@ -23,11 +23,15 @@
         .photo-grid td { border: none; padding: 0 8px 8px 0; width: 110px; }
         .photo-thumb { width: 100px; height: 100px; object-fit: cover; border: 1px solid #d1d5db; border-radius: 8px; }
         .photo-note { margin: 8px 0 0; color: #6b7280; font-size: 11px; }
+        .question-block { margin-top: 10px; padding: 10px 12px; border: 1px solid #d1d5db; background: #f9fafb; border-radius: 8px; page-break-inside: avoid; break-inside: avoid; }
+        .question-block strong { display: block; margin-bottom: 6px; font-size: 12px; }
+        .question-block p { margin: 0; color: #374151; line-height: 1.55; }
+        .question-list { page-break-inside: auto; }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>SHG Monthly Report</h1>
+        <h1>Community Mobilizer Monthly Report</h1>
         <p>{{ $report['month']->format('F Y') }}</p>
     </div>
 
@@ -64,23 +68,15 @@
         </tbody>
     </table>
 
-    <h3 class="section-title">Monthly Progress Notes</h3>
-    <table class="data-table">
-        <thead>
-            <tr>
-                <th>Topic</th>
-                <th>Answer</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($monthlyNarrativeLabels as $field => $label)
-                <tr>
-                    <td>{{ $label }}</td>
-                    <td>{{ $report['monthly_narrative'][$field] ?: 'Not added.' }}</td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
+    <h3 class="section-title">Monthly Progress Report</h3>
+    <div class="question-list">
+        @foreach ($monthlyNarrativeLabels as $field => $label)
+            <div class="question-block">
+                <strong>{{ $label }}</strong>
+                <p>{{ $report['monthly_narrative'][$field] ?: 'Not added.' }}</p>
+            </div>
+        @endforeach
+    </div>
 
     <h3 class="section-title">Day-wise Detailed Report</h3>
     @forelse ($report['activities'] as $activity)

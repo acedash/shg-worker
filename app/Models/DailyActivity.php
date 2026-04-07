@@ -45,6 +45,7 @@ class DailyActivity extends Model
         'households_sensitized_rrr',
         'remarks',
         'photo_paths',
+        'document_paths',
     ];
 
     protected function casts(): array
@@ -52,6 +53,7 @@ class DailyActivity extends Model
         return [
             'activity_date' => 'date',
             'photo_paths' => 'array',
+            'document_paths' => 'array',
         ];
     }
 

@@ -30,6 +30,7 @@ class AuthController extends Controller
             'phone' => ['nullable', 'string', 'max:20'],
             'district_id' => ['required', 'exists:districts,id'],
             'ulb_id' => ['required', 'exists:ulbs,id'],
+            'assigned_ward' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'confirmed', Password::min(8)],
         ]);
@@ -74,7 +75,9 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard'));
+        return redirect()->route(
+            Auth::user()->isAdmin() ? 'admin.dashboard' : 'worker.dashboard'
+        );
     }
 
     public function logout(Request $request)

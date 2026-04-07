@@ -4,9 +4,9 @@
     <div class="hero worker-submissions-hero">
         <div class="worker-submissions-hero-grid">
             <div>
-                <span class="page-kicker">Monthly Reports</span>
-                <h2>Daily Activity Logs</h2>
-                <p>Review every saved day for {{ $selectedMonth->format('F Y') }}, then complete the monthly progress report before exporting.</p>
+                <span class="page-kicker">Community Mobilizer Monthly Report</span>
+                <h2>Monthly Report Summary</h2>
+                <p>Review the month for {{ $selectedMonth->format('F Y') }}, complete the monthly progress report, and then check the saved daily logs below.</p>
             </div>
 
             <div class="worker-submissions-actions">

@@ -59,6 +59,13 @@
                         @enderror
                     </div>
                     <div>
+                        <label for="assigned_ward">Assigned Ward</label>
+                        <input id="assigned_ward" class="@error('assigned_ward') input-error @enderror" type="text" name="assigned_ward" value="{{ old('assigned_ward') }}" required>
+                        @error('assigned_ward')
+                            <div class="field-error">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div>
                         <label for="email">Email</label>
                         <input id="email" class="@error('email') input-error @enderror" type="email" name="email" value="{{ old('email') }}" required>
                         @error('email')

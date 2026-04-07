@@ -17,20 +17,20 @@ class MonthlyReportService
         return [
             'households_visited' => 'No. of Households Visited',
             'commercial_shops_visited' => 'No. of Commercial Shops Visited',
-            'institutions_visited' => 'No. of Public and Private Institutions Visited',
-            'religious_places_visited' => 'No. of Religious Places Visited',
-            'transit_locations_visited' => 'No. of Transit Locations Visited',
+            'institutions_visited' => 'No. of Public and Private Institutions (Schools, Colleges, Offices, Hospitals, Hotels, Mall etc.) Visited',
+            'religious_places_visited' => 'No. of Religious Places (Temple, Gurudwara, Mosque, Church) Visited',
+            'transit_locations_visited' => 'No. of Transit Location (Bus Stand/ Taxi Stand/ Railway Station) Visited',
             'toilets_visited' => 'No. of CT/PT/Aspirational Toilets Visited',
-            'swm_assets_visited' => 'No. of SWM Assets Visited',
+            'swm_assets_visited' => 'No. of SWM Assets (Twin Bins, Compost Pit, Transfer Station) visited',
             'open_burning_issues_found' => 'No. of Open Burning of Garbage Points Found',
             'gvp_points_found' => 'No. of Garbage Vulnerable Points (GVP) Found',
             'illegal_dumping_points_found' => 'No. of Illegal Dumping Points Found',
             'cd_waste_points_found' => 'No. of C&D Waste Points Found',
             'littering_points_found' => 'No. of Littering Points Found',
             'open_defecation_points_found' => 'No. of Open Defecation Points Found',
-            'yellow_red_spots_found' => 'No. of Yellow/Red Spots Found',
+            'yellow_red_spots_found' => 'No. of Yellow/Red Spot Found',
             'polluted_water_bodies_found' => 'No. of Polluted Water Bodies Found',
-            'complaints_received' => 'No. of complaints received from residents about SWM issues',
+            'complaints_received' => 'No. of complaints received from the resident about SWM related issues',
         ];
     }
 
@@ -53,7 +53,7 @@ class MonthlyReportService
             'CT/PT/Aspirational Toilets' => [
                 'toilets_visited',
             ],
-            'Solid Waste Management (SWM) Assets / Infrastructure' => [
+            'Solid Waste Management (SWM) Assets /Infrastructure' => [
                 'swm_assets_visited',
             ],
             'SWM Issues' => [
@@ -170,7 +170,7 @@ class MonthlyReportService
             fputcsv($handle, ['ULB', $report['user']->ulb_name]);
             fputcsv($handle, ['Month', $report['month']->format('F Y')]);
             fputcsv($handle, []);
-            fputcsv($handle, ['Monthly Progress Notes']);
+            fputcsv($handle, ['Monthly Progress Report']);
 
             foreach (self::monthlyNarrativeLabels() as $field => $label) {
                 fputcsv($handle, [$label, $report['monthly_narrative'][$field] ?: '']);
@@ -247,7 +247,7 @@ class MonthlyReportService
     private function monthlyWhatsappText(array $report): string
     {
         $lines = [
-            'SHG Monthly Report',
+            'Community Mobilizer Monthly Report',
             'Worker: '.$report['user']->name,
             'District: '.$report['user']->district_name,
             'ULB: '.$report['user']->ulb_name,
@@ -269,7 +269,7 @@ class MonthlyReportService
 
         if (filled($report['final_remark'] ?? null)) {
             $lines[] = '';
-            $lines[] = 'Monthly Progress Notes:';
+            $lines[] = 'Monthly Progress Report:';
 
             foreach (self::monthlyNarrativeLabels() as $field => $label) {
                 if (filled($report['monthly_narrative'][$field] ?? null)) {

@@ -27,6 +27,7 @@ class User extends Authenticatable
         'ulb_id',
         'district_name',
         'ulb_name',
+        'assigned_ward',
         'email',
         'role',
         'password',
