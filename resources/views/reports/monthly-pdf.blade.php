@@ -49,11 +49,11 @@
         </tr>
     </table>
 
-    <h3 class="section-title">Monthly Totals</h3>
+    <h3 class="section-title">Monthly Field Visits</h3>
     <table class="data-table">
         <thead>
             <tr>
-                <th>Metric</th>
+                <th>Particulars</th>
                 <th>Total</th>
             </tr>
         </thead>

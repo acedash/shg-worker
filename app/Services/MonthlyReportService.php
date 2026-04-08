@@ -178,7 +178,7 @@ class MonthlyReportService
 
             fputcsv($handle, []);
             fputcsv($handle, ['Monthly Overview']);
-            fputcsv($handle, ['Metric', 'Monthly Total']);
+            fputcsv($handle, ['Particulars', 'Monthly Total']);
 
             foreach (self::metricLabels() as $field => $label) {
                 fputcsv($handle, [$label, $report['totals'][$field]]);
@@ -191,7 +191,7 @@ class MonthlyReportService
                 fputcsv($handle, ['Date', $activity->activity_date->format('d M Y')]);
                 fputcsv($handle, ['Remarks', $activity->remarks ?: 'No remarks added.']);
                 fputcsv($handle, ['Proof Photos', $this->csvPhotoSummary($activity)]);
-                fputcsv($handle, ['Metric', 'Daily Value']);
+                fputcsv($handle, ['Particulars', 'Daily Value']);
 
                 foreach (self::metricLabels() as $field => $label) {
                     fputcsv($handle, [$label, (int) $activity->{$field}]);
