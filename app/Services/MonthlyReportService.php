@@ -24,7 +24,6 @@ class MonthlyReportService
             'swm_assets_visited' => 'No. of SWM Assets (Twin Bins, Compost Pit, Transfer Station) visited',
             'open_burning_issues_found' => 'No. of Open Burning of Garbage Points Found',
             'gvp_points_found' => 'No. of Garbage Vulnerable Points (GVP) Found',
-            'illegal_dumping_points_found' => 'No. of Illegal Dumping Points Found',
             'cd_waste_points_found' => 'No. of C&D Waste Points Found',
             'littering_points_found' => 'No. of Littering Points Found',
             'open_defecation_points_found' => 'No. of Open Defecation Points Found',
@@ -59,7 +58,6 @@ class MonthlyReportService
             'SWM Issues' => [
                 'open_burning_issues_found',
                 'gvp_points_found',
-                'illegal_dumping_points_found',
                 'cd_waste_points_found',
                 'littering_points_found',
                 'open_defecation_points_found',

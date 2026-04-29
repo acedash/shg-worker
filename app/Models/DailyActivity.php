@@ -24,7 +24,6 @@ class DailyActivity extends Model
         'households_started_home_composting',
         'open_burning_issues_found',
         'gvp_points_found',
-        'illegal_dumping_points_found',
         'cd_waste_points_found',
         'littering_points_found',
         'open_defecation_points_found',

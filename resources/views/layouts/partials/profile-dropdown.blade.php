@@ -20,6 +20,9 @@
                 Signed in as {{ auth()->user()->email }}
             </div>
         @endif
+        <a href="{{ route('profile.edit') }}">
+            Edit Profile
+        </a>
         <form action="{{ route('logout') }}" method="POST">
             @csrf
             <button type="submit">Logout</button>

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WorkerDashboardController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,6 +29,9 @@ Route::middleware('auth')->group(function (): void {
             ? redirect()->route('admin.dashboard')
             : redirect()->route('worker.dashboard');
     })->name('dashboard');
+
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
     Route::get('/worker/dashboard', [WorkerDashboardController::class, 'index'])->name('worker.dashboard');
     Route::get('/worker/daily-activity', [WorkerDashboardController::class, 'showForm'])->name('worker.daily-activity.form');
