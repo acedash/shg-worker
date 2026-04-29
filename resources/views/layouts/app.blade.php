@@ -222,6 +222,19 @@
             padding-top: 10px;
             border-top: 1px solid var(--line);
         }
+        .mobile-menu-actions a {
+            width: 100%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 11px 12px;
+            border-radius: 10px;
+            background: #fff;
+            border: 1px solid var(--line);
+            color: var(--text);
+            text-decoration: none;
+            box-shadow: none;
+        }
         .mobile-menu-actions button {
             width: 100%;
             justify-content: flex-start;
@@ -1722,12 +1735,14 @@
                 @auth
                     <div class="mobile-menu" data-mobile-menu>
                         <div class="mobile-menu-panel">
+                            @php($mobileRoleLabel = auth()->user()->role === 'worker' ? 'Community Mobilizer' : ucfirst(auth()->user()->role))
                             <div class="mobile-menu-profile">
                                 <strong>{{ auth()->user()->name }}</strong>
-                                <span>{{ ucfirst(auth()->user()->role) }}</span>
+                                <span>{{ $mobileRoleLabel }}</span>
                             </div>
                             @include('layouts.partials.nav-links')
                             <div class="mobile-menu-actions">
+                                <a href="{{ route('profile.edit') }}">Edit Profile</a>
                                 <form action="{{ route('logout') }}" method="POST">
                                     @csrf
                                     <button type="submit">Logout</button>
