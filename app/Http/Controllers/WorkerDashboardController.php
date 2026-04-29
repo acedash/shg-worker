@@ -6,6 +6,7 @@ use App\Models\DailyActivity;
 use App\Models\MonthlyFinalRemark;
 use App\Services\MonthlyReportService;
 use Carbon\Carbon;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
@@ -40,11 +41,11 @@ class WorkerDashboardController extends Controller
 
     public function showForm(Request $request)
     {
-        $selectedDate = Carbon::parse($request->query('date', now()->toDateString()));
+        $selectedDate = Carbon::parse($request->query('date', now()->toDateString()))->startOfDay();
         $selectedMonth = $this->resolveMonth($request->query('month'));
         $activity = $request->user()
             ->dailyActivities()
-            ->whereDate('activity_date', $selectedDate)
+            ->whereDate('activity_date', $selectedDate->toDateString())
             ->first();
 
         return view('worker.form', [
@@ -131,6 +132,7 @@ class WorkerDashboardController extends Controller
     public function store(Request $request)
     {
         $validated = $this->validateActivity($request);
+        unset($validated['photos'], $validated['documents']);
         $activityDate = Carbon::parse($validated['activity_date'])->toDateString();
         $existingActivity = DailyActivity::query()
             ->where('user_id', $request->user()->id)
@@ -151,19 +153,34 @@ class WorkerDashboardController extends Controller
             }
         }
 
-        DailyActivity::updateOrCreate(
-            [
-                'user_id' => $request->user()->id,
-                'activity_date' => $activityDate,
-            ],
-            [
-                ...$validated,
-                'user_id' => $request->user()->id,
-                'activity_date' => $activityDate,
-                'photo_paths' => $photoPaths,
-                'document_paths' => $documentPaths,
-            ]
-        );
+        $userId = $request->user()->id;
+
+        $values = [
+            ...$validated,
+            'user_id' => $userId,
+            'activity_date' => $activityDate,
+            'photo_paths' => $photoPaths,
+            'document_paths' => $documentPaths,
+            'updated_at' => now(),
+        ];
+
+        // Avoid unique-constraint crashes on double-submit or slow networks:
+        // do update first; if no row exists, create; if a race happens, retry update.
+        try {
+            $updated = DailyActivity::query()
+                ->where('user_id', $userId)
+                ->whereDate('activity_date', $activityDate)
+                ->update($values);
+
+            if ($updated === 0) {
+                DailyActivity::create($values);
+            }
+        } catch (UniqueConstraintViolationException) {
+            DailyActivity::query()
+                ->where('user_id', $userId)
+                ->whereDate('activity_date', $activityDate)
+                ->update($values);
+        }
 
         return redirect()
             ->route('worker.daily-activity.form', [

@@ -87,7 +87,7 @@
                         <label for="quick-month">Month</label>
                         <input id="quick-month" type="month" name="month" value="{{ $selectedMonth->format('Y-m') }}">
                     </div>
-                    <button class="button button-primary" type="submit">Open Daily Form</button>
+                    <button class="button button-primary" type="submit">Edit Daily Report</button>
                 </form>
             </div>
 
@@ -115,7 +115,7 @@
                                 </div>
                                 <p>{{ $row->remarks ?: 'No remarks added for this entry.' }}</p>
                                 <div class="worker-recent-actions">
-                                    <a class="button button-primary" href="{{ route('worker.daily-activity.form', ['date' => $row->activity_date->format('Y-m-d'), 'month' => $row->activity_date->format('Y-m')]) }}">Open</a>
+                                    <a class="button button-primary" href="{{ route('worker.daily-activity.form', ['date' => $row->activity_date->format('Y-m-d'), 'month' => $row->activity_date->format('Y-m')]) }}">Edit</a>
                                     <a class="button button-secondary button-icon" href="{{ route('worker.reports.daily', ['activity' => $row->id]) }}">
                                         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z" /><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" /></svg>
                                         <span>View</span>

@@ -121,7 +121,7 @@
                             </td>
                             <td class="submissions-actions-cell">
                                 <div class="submissions-actions-inline">
-                                    <a class="button button-primary" href="{{ route('worker.daily-activity.form', ['date' => $activity->activity_date->format('Y-m-d'), 'month' => $activity->activity_date->format('Y-m')]) }}">Open</a>
+                                    <a class="button button-primary" href="{{ route('worker.daily-activity.form', ['date' => $activity->activity_date->format('Y-m-d'), 'month' => $activity->activity_date->format('Y-m')]) }}">Edit</a>
                                     <a class="button button-secondary button-icon" href="{{ route('worker.reports.daily', ['activity' => $activity->id]) }}">
                                         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z" /><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" /></svg>
                                         <span>View</span>
@@ -149,7 +149,7 @@
                         </div>
                         <p class="submission-remark">{{ $activity->remarks ?: 'No notes added for this entry.' }}</p>
                         <div class="submission-actions">
-                            <a class="button button-primary" href="{{ route('worker.daily-activity.form', ['date' => $activity->activity_date->format('Y-m-d'), 'month' => $activity->activity_date->format('Y-m')]) }}">Open</a>
+                            <a class="button button-primary" href="{{ route('worker.daily-activity.form', ['date' => $activity->activity_date->format('Y-m-d'), 'month' => $activity->activity_date->format('Y-m')]) }}">Edit</a>
                             <a class="button button-secondary button-icon" href="{{ route('worker.reports.daily', ['activity' => $activity->id]) }}">
                                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z" /><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" /></svg>
                                 <span>View</span>

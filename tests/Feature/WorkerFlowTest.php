@@ -145,7 +145,7 @@ class WorkerFlowTest extends TestCase
         $response = $this->actingAs($worker)->get(route('worker.submissions', ['month' => '2026-04']));
 
         $response->assertOk();
-        $response->assertSeeText('Daily Activity Logs');
+        $response->assertSeeText('Monthly Report Summary');
         $response->assertSeeText('Morning round done.');
     }
 
@@ -180,7 +180,7 @@ class WorkerFlowTest extends TestCase
 
         $exportResponse = $this->actingAs($worker)->get(route('worker.reports.monthly', ['month' => '2026-04']));
         $exportResponse->assertOk();
-        $this->assertStringContainsString('Monthly Progress Notes', $exportResponse->streamedContent());
+        $this->assertStringContainsString('Monthly Progress Report', $exportResponse->streamedContent());
         $this->assertStringContainsString('Segregation awareness improved in most households.', $exportResponse->streamedContent());
 
         $pdfResponse = $this->actingAs($worker)->get(route('worker.reports.monthly.pdf', ['month' => '2026-04']));
