@@ -34,7 +34,7 @@
                 </div>
                 <div>
                     <strong style="display: block; font-size: 1.8rem; color: var(--brand); font-weight: 700;">{{ $stats['total_workers'] }}</strong>
-                    <span style="color: var(--muted); font-size: 0.95rem; font-weight: 500;">Field Force Registered</span>
+                    <span style="color: var(--muted); font-size: 0.95rem; font-weight: 500;">Total Community Mobilizers</span>
                 </div>
             </div>
         </div>
@@ -46,7 +46,7 @@
                 </div>
                 <div>
                     <strong style="display: block; font-size: 1.8rem; color: #3b82f6; font-weight: 700;">{{ $stats['monthly_logs'] }}</strong>
-                    <span style="color: var(--muted); font-size: 0.95rem; font-weight: 500;">Monthly Logs Logged</span>
+                    <span style="color: var(--muted); font-size: 0.95rem; font-weight: 500;">Total Submissions (Month)</span>
                 </div>
             </div>
         </div>
@@ -57,8 +57,8 @@
                     <svg style="width:24px; height:24px; stroke: currentColor; fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round;" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2" /></svg>
                 </div>
                 <div>
-                    <strong style="display: block; font-size: 1.8rem; color: #10b981; font-weight: 700;">Live</strong>
-                    <span style="color: var(--muted); font-size: 0.95rem; font-weight: 500;">Recent Stream Monitoring</span>
+                    <strong style="display: block; font-size: 1.8rem; color: #10b981; font-weight: 700;">{{ $stats['active_workers'] }}</strong>
+                    <span style="color: var(--muted); font-size: 0.95rem; font-weight: 500;">Active Mobilizers (Month)</span>
                 </div>
             </div>
         </div>
@@ -148,8 +148,18 @@
                 <span style="color: var(--muted); font-size: 0.9rem;">
                     Showing {{ $workers->firstItem() ?: 0 }}-{{ $workers->lastItem() ?: 0 }} of {{ $workers->total() }} workers
                 </span>
-                <div>
-                    {{ $workers->links() }}
+                <div style="display:flex; gap:8px;">
+                    @if ($workers->onFirstPage())
+                        <span class="button button-secondary" style="opacity:0.55; pointer-events:none; min-height: 38px; padding: 8px 12px; font-size: 0.88rem;">Previous</span>
+                    @else
+                        <a class="button button-secondary" style="min-height: 38px; padding: 8px 12px; font-size: 0.88rem;" href="{{ $workers->previousPageUrl() }}">Previous</a>
+                    @endif
+
+                    @if ($workers->hasMorePages())
+                        <a class="button button-secondary" style="min-height: 38px; padding: 8px 12px; font-size: 0.88rem;" href="{{ $workers->nextPageUrl() }}">Next</a>
+                    @else
+                        <span class="button button-secondary" style="opacity:0.55; pointer-events:none; min-height: 38px; padding: 8px 12px; font-size: 0.88rem;">Next</span>
+                    @endif
                 </div>
             </div>
         </div>

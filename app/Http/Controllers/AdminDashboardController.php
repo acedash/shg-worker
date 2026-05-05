@@ -33,6 +33,11 @@ class AdminDashboardController extends Controller
             ->whereBetween('activity_date', [$start, $end])
             ->count();
 
+        $activeWorkersThisMonth = DailyActivity::query()
+            ->whereBetween('activity_date', [$start, $end])
+            ->distinct('user_id')
+            ->count('user_id');
+
         $workers = User::query()
             ->where('role', 'worker')
             ->withCount([
@@ -73,6 +78,7 @@ class AdminDashboardController extends Controller
             'stats' => [
                 'total_workers' => $totalWorkers,
                 'monthly_logs' => $monthlyLogs,
+                'active_workers' => $activeWorkersThisMonth,
             ],
         ]);
     }
