@@ -33,7 +33,7 @@
                     <svg style="width:24px; height:24px; stroke: currentColor; fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round;" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" /></svg>
                 </div>
                 <div>
-                    <strong style="display: block; font-size: 1.8rem; color: var(--brand); font-weight: 700;">{{ $workers->count() }}</strong>
+                    <strong style="display: block; font-size: 1.8rem; color: var(--brand); font-weight: 700;">{{ $stats['total_workers'] }}</strong>
                     <span style="color: var(--muted); font-size: 0.95rem; font-weight: 500;">Field Force Registered</span>
                 </div>
             </div>
@@ -45,7 +45,7 @@
                     <svg style="width:24px; height:24px; stroke: currentColor; fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round;" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" /></svg>
                 </div>
                 <div>
-                    <strong style="display: block; font-size: 1.8rem; color: #3b82f6; font-weight: 700;">{{ $workers->sum('submissions_this_month') }}</strong>
+                    <strong style="display: block; font-size: 1.8rem; color: #3b82f6; font-weight: 700;">{{ $stats['monthly_logs'] }}</strong>
                     <span style="color: var(--muted); font-size: 0.95rem; font-weight: 500;">Monthly Logs Logged</span>
                 </div>
             </div>
@@ -73,6 +73,28 @@
                     <h3 style="margin:0; font-size: 1.2rem;">Registered Field Force</h3>
                     <p style="margin: 4px 0 0; color: var(--muted); font-size: 0.9rem;">View and manage registered workers' data access.</p>
                 </div>
+                <form method="GET" action="{{ route('admin.dashboard') }}" style="display:flex; gap:10px; flex-wrap: wrap; justify-content: flex-end; align-items: center;">
+                    <input type="hidden" name="month" value="{{ $selectedMonth->format('Y-m') }}">
+                    <input type="text" name="q" value="{{ $filters['q'] }}" placeholder="Search name / email / phone" style="min-width: 220px; background: #fff; border: 1px solid var(--line); padding: 10px 12px; border-radius: 12px; font-size: 0.92rem;">
+                    <select id="admin_district_id" name="district_id" style="min-width: 180px; background: #fff; border: 1px solid var(--line); padding: 10px 12px; border-radius: 12px; font-size: 0.92rem;">
+                        <option value="">All Districts</option>
+                        @foreach ($districts as $district)
+                            <option value="{{ $district->id }}" {{ (string) $filters['district_id'] === (string) $district->id ? 'selected' : '' }}>{{ $district->name }}</option>
+                        @endforeach
+                    </select>
+                    <select id="admin_ulb_id" name="ulb_id" style="min-width: 200px; background: #fff; border: 1px solid var(--line); padding: 10px 12px; border-radius: 12px; font-size: 0.92rem;">
+                        <option value="">All ULBs</option>
+                        @foreach ($districts as $district)
+                            @foreach ($district->ulbs as $ulb)
+                                <option value="{{ $ulb->id }}" data-district-id="{{ $district->id }}" {{ (string) $filters['ulb_id'] === (string) $ulb->id ? 'selected' : '' }}>
+                                    {{ $ulb->name }}
+                                </option>
+                            @endforeach
+                        @endforeach
+                    </select>
+                    <button class="button button-primary" type="submit" style="min-height: 42px; padding: 10px 14px; font-size: 0.9rem;">Filter</button>
+                    <a class="button button-secondary" href="{{ route('admin.dashboard', ['month' => $selectedMonth->format('Y-m')]) }}" style="min-height: 42px; padding: 10px 14px; font-size: 0.9rem;">Clear</a>
+                </form>
             </div>
             <div style="overflow-x: auto;">
                 <table style="width: 100%; border-collapse: separate; border-spacing: 0;">
@@ -121,6 +143,14 @@
                         @endforelse
                     </tbody>
                 </table>
+            </div>
+            <div style="padding: 14px 24px; border-top: 1px solid var(--line); background: #fff; display:flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
+                <span style="color: var(--muted); font-size: 0.9rem;">
+                    Showing {{ $workers->firstItem() ?: 0 }}-{{ $workers->lastItem() ?: 0 }} of {{ $workers->total() }} workers
+                </span>
+                <div>
+                    {{ $workers->links() }}
+                </div>
             </div>
         </div>
 
@@ -180,4 +210,39 @@
             </div>
         </div>
     </div>
+
+    <script>
+        (function () {
+            var districtSelect = document.getElementById('admin_district_id');
+            var ulbSelect = document.getElementById('admin_ulb_id');
+
+            if (!districtSelect || !ulbSelect) {
+                return;
+            }
+
+            var options = Array.from(ulbSelect.querySelectorAll('option[data-district-id]'));
+
+            function syncUlbs() {
+                var districtId = districtSelect.value;
+                var currentValue = ulbSelect.value;
+                var hasVisibleSelected = false;
+
+                options.forEach(function (option) {
+                    var visible = !districtId || option.dataset.districtId === districtId;
+                    option.hidden = !visible;
+
+                    if (visible && option.value === currentValue) {
+                        hasVisibleSelected = true;
+                    }
+                });
+
+                if (!hasVisibleSelected) {
+                    ulbSelect.value = '';
+                }
+            }
+
+            districtSelect.addEventListener('change', syncUlbs);
+            syncUlbs();
+        })();
+    </script>
 @endsection

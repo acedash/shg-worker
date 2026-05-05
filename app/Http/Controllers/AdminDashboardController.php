@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\DailyActivity;
+use App\Models\District;
 use App\Models\User;
 use App\Services\MonthlyReportService;
 use Carbon\Carbon;
@@ -17,17 +18,38 @@ class AdminDashboardController extends Controller
     public function index(Request $request)
     {
         $selectedMonth = $this->resolveMonth($request->query('month'));
+        $start = $selectedMonth->copy()->startOfMonth()->toDateString();
+        $end = $selectedMonth->copy()->endOfMonth()->toDateString();
+
+        $search = trim((string) $request->query('q', ''));
+        $districtId = $request->query('district_id');
+        $ulbId = $request->query('ulb_id');
+
+        $totalWorkers = User::query()
+            ->where('role', 'worker')
+            ->count();
+
+        $monthlyLogs = DailyActivity::query()
+            ->whereBetween('activity_date', [$start, $end])
+            ->count();
 
         $workers = User::query()
             ->where('role', 'worker')
             ->withCount([
-                'dailyActivities as submissions_this_month' => fn ($query) => $query->whereBetween('activity_date', [
-                    $selectedMonth->copy()->startOfMonth()->toDateString(),
-                    $selectedMonth->copy()->endOfMonth()->toDateString(),
-                ]),
+                'dailyActivities as submissions_this_month' => fn ($query) => $query->whereBetween('activity_date', [$start, $end]),
             ])
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($inner) use ($search) {
+                    $inner->where('name', 'like', '%'.$search.'%')
+                        ->orWhere('email', 'like', '%'.$search.'%')
+                        ->orWhere('phone', 'like', '%'.$search.'%');
+                });
+            })
+            ->when($districtId, fn ($query) => $query->where('district_id', $districtId))
+            ->when($ulbId, fn ($query) => $query->where('ulb_id', $ulbId))
             ->orderBy('name')
-            ->get();
+            ->paginate(25)
+            ->withQueryString();
 
         $recentActivities = DailyActivity::query()
             ->with('user')
@@ -42,6 +64,16 @@ class AdminDashboardController extends Controller
             'selectedMonth' => $selectedMonth,
             'workers' => $workers,
             'recentActivities' => $recentActivities,
+            'districts' => District::query()->with('ulbs')->orderBy('name')->get(),
+            'filters' => [
+                'q' => $search,
+                'district_id' => $districtId,
+                'ulb_id' => $ulbId,
+            ],
+            'stats' => [
+                'total_workers' => $totalWorkers,
+                'monthly_logs' => $monthlyLogs,
+            ],
         ]);
     }
 
