@@ -114,7 +114,9 @@
                                             {{ substr($worker->name, 0, 1) }}
                                         </div>
                                         <div>
-                                            <strong style="display: block; color: var(--text);">{{ $worker->name }}</strong>
+                                            <a href="{{ route('admin.workers.profile', $worker->id) }}" style="text-decoration: none; display: block;">
+                                                <strong style="display: block; color: var(--text); transition: color 0.2s;" onmouseover="this.style.color='var(--brand)'" onmouseout="this.style.color='var(--text)'">{{ $worker->name }}</strong>
+                                            </a>
                                             <span style="color: var(--muted); font-size: 0.85rem;">{{ $worker->district_name }} • {{ $worker->ulb_name }}</span>
                                         </div>
                                     </div>
@@ -126,6 +128,9 @@
                                 </td>
                                 <td style="padding: 16px 24px;">
                                     <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                                        <a class="button button-secondary button-icon" style="padding: 8px; border-radius: 10px;" href="{{ route('admin.workers.profile', $worker->id) }}" title="View Profile">
+                                            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+                                        </a>
                                         <a class="button button-secondary button-icon" style="padding: 8px; border-radius: 10px;" href="{{ route('admin.workers.reports.monthly.whatsapp', ['user' => $worker->id, 'month' => $selectedMonth->format('Y-m')]) }}" title="Share via WhatsApp">
                                             <svg style="color: #25D366;" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 01-11.7 7.1L4 20l1-4.1A8 8 0 1120 12z" /></svg>
                                         </a>
@@ -189,7 +194,9 @@
                                             <span style="font-size: 0.65rem; font-weight: 800; color: var(--muted); text-transform: uppercase;">{{ $activity->activity_date->format('M') }}</span>
                                         </div>
                                         <div>
-                                            <strong style="display: block; color: var(--text); font-size: 1rem;">{{ $activity->user->name }}</strong>
+                                            <a href="{{ route('admin.workers.profile', $activity->user_id) }}" style="text-decoration: none; display: block;">
+                                                <strong style="display: block; color: var(--text); font-size: 1rem; transition: color 0.2s;" onmouseover="this.style.color='var(--brand)'" onmouseout="this.style.color='var(--text)'">{{ $activity->user->name }}</strong>
+                                            </a>
                                             <span style="color: var(--muted); font-size: 0.85rem;">{{ $activity->user->district_name }} • {{ $activity->user->ulb_name }}</span>
                                         </div>
                                     </div>

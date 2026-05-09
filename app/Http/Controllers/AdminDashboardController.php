@@ -131,6 +131,20 @@ class AdminDashboardController extends Controller
         return redirect()->away($this->reports->whatsappUrlForMonthly($report));
     }
 
+    public function showWorkerProfile(User $user)
+    {
+        abort_if($user->isAdmin(), 404);
+
+        $totalSubmissions = $user->dailyActivities()->count();
+        $recentActivities = $user->dailyActivities()->latest('activity_date')->limit(5)->get();
+
+        return view('admin.worker_profile', [
+            'worker' => $user,
+            'totalSubmissions' => $totalSubmissions,
+            'recentActivities' => $recentActivities,
+        ]);
+    }
+
     private function resolveMonth(?string $month): Carbon
     {
         return $month
