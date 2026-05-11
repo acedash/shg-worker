@@ -64,8 +64,103 @@
         </div>
     </div>
 
+    <!-- ULB Export Panel -->
+    <div class="card" style="margin-bottom: 32px; padding: 0; overflow: hidden; border: 2px solid #c7d2fe;">
+        <div style="padding: 20px 24px; background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%); border-bottom: 1px solid #c7d2fe; display: flex; align-items: center; gap: 12px;">
+            <div style="width: 40px; height: 40px; border-radius: 10px; background: #4f46e5; color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <svg style="width:20px;height:20px;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M16 12l-4 4-4-4M12 3v13"/></svg>
+            </div>
+            <div>
+                <h3 style="margin:0; font-size: 1.1rem; color: #3730a3;">Export ULB-wise Compiled Reports</h3>
+                <p style="margin: 2px 0 0; font-size: 0.88rem; color: #6366f1;">Download a compiled PDF or Excel sheet containing all workers' monthly reports for a selected ULB.</p>
+            </div>
+        </div>
+        <div style="padding: 20px 24px;">
+            <form id="ulbExportForm" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end;">
+                <div style="display: flex; flex-direction: column; gap: 6px; min-width: 200px;">
+                    <label style="font-size: 0.8rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em;">District</label>
+                    <select id="export_district_id" style="background: #fff; border: 1px solid var(--line); padding: 10px 12px; border-radius: 12px; font-size: 0.92rem;">
+                        <option value="">All Districts</option>
+                        @foreach ($districts as $district)
+                            <option value="{{ $district->id }}">{{ $district->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 6px; min-width: 220px;">
+                    <label style="font-size: 0.8rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em;">ULB <span style="color:#ef4444;">*</span></label>
+                    <select id="export_ulb_id" style="background: #fff; border: 1px solid var(--line); padding: 10px 12px; border-radius: 12px; font-size: 0.92rem;">
+                        <option value="">— Select a ULB —</option>
+                        @foreach ($districts as $district)
+                            @foreach ($district->ulbs as $ulb)
+                                <option value="{{ $ulb->id }}" data-district-id="{{ $district->id }}"
+                                    data-pdf-url="{{ route('admin.ulb.reports.monthly.pdf', ['ulb' => $ulb->id, 'month' => '__MONTH__']) }}"
+                                    data-csv-url="{{ route('admin.ulb.reports.monthly',     ['ulb' => $ulb->id, 'month' => '__MONTH__']) }}">
+                                    {{ $ulb->name }}
+                                </option>
+                            @endforeach
+                        @endforeach
+                    </select>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 6px; min-width: 180px;">
+                    <label style="font-size: 0.8rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em;">Month</label>
+                    <input type="month" id="export_month" value="{{ $selectedMonth->format('Y-m') }}"
+                           style="background: #fff; border: 1px solid var(--line); padding: 10px 12px; border-radius: 12px; font-size: 0.92rem;">
+                </div>
+                <div style="display: flex; gap: 10px; padding-bottom: 1px;">
+                    <button type="button" id="exportPdfBtn"
+                        style="display:inline-flex; align-items:center; gap:8px; padding: 10px 20px; background: #ef4444; color: #fff; border-radius: 12px; font-weight: 600; font-size: 0.9rem; border: none; cursor: pointer; transition: opacity 0.2s;"
+                        onclick="triggerUlbExport('pdf')">
+                        <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg>
+                        Download PDF
+                    </button>
+                    <button type="button" id="exportCsvBtn"
+                        style="display:inline-flex; align-items:center; gap:8px; padding: 10px 20px; background: #16a34a; color: #fff; border-radius: 12px; font-weight: 600; font-size: 0.9rem; border: none; cursor: pointer; transition: opacity 0.2s;"
+                        onclick="triggerUlbExport('csv')">
+                        <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M16 12l-4 4-4-4M12 3v13"/></svg>
+                        Download Excel
+                    </button>
+                </div>
+            </form>
+            <p id="export_error" style="display:none; margin: 10px 0 0; color: #ef4444; font-size: 0.88rem; font-weight: 500;">⚠ Please select a ULB before downloading.</p>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            var exportDistrict = document.getElementById('export_district_id');
+            var exportUlb      = document.getElementById('export_ulb_id');
+            var exportOpts     = Array.from(exportUlb.querySelectorAll('option[data-district-id]'));
+
+            exportDistrict.addEventListener('change', function () {
+                var did = exportDistrict.value;
+                exportOpts.forEach(function (o) { o.hidden = did && o.dataset.districtId !== did; });
+                exportUlb.value = '';
+            });
+        })();
+
+        function triggerUlbExport(type) {
+            var ulbSel  = document.getElementById('export_ulb_id');
+            var errEl   = document.getElementById('export_error');
+            var month   = document.getElementById('export_month').value;
+            var opt     = ulbSel.options[ulbSel.selectedIndex];
+
+            if (!ulbSel.value) {
+                errEl.style.display = 'block';
+                return;
+            }
+            errEl.style.display = 'none';
+
+            var url = type === 'pdf'
+                ? opt.dataset.pdfUrl.replace('__MONTH__', month)
+                : opt.dataset.csvUrl.replace('__MONTH__', month);
+
+            window.location.href = url;
+        }
+    </script>
+
     <!-- Main Data Split View -->
     <div class="grid grid-2" style="gap: 24px; align-items: start;">
+
         <!-- Registered Workers Table -->
         <div class="card" style="padding: 0; overflow: hidden;">
             <div style="padding: 24px; background: var(--surface-soft); border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center;">
@@ -96,6 +191,7 @@
                     <a class="button button-secondary" href="{{ route('admin.dashboard', ['month' => $selectedMonth->format('Y-m')]) }}" style="min-height: 42px; padding: 10px 14px; font-size: 0.9rem;">Clear</a>
                 </form>
             </div>
+
             <div style="overflow-x: auto;">
                 <table style="width: 100%; border-collapse: separate; border-spacing: 0;">
                     <thead>

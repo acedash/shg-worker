@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\DailyActivity;
 use App\Models\MonthlyFinalRemark;
+use App\Models\Ulb;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
@@ -209,6 +210,116 @@ class MonthlyReportService
             'metricLabels' => self::metricLabels(),
             'monthlyNarrativeLabels' => self::monthlyNarrativeLabels(),
         ])->setPaper('a4')->download($filename);
+    }
+
+    /**
+     * Build an array of monthly reports for every worker in a ULB.
+     */
+    public function buildForUlbMonth(Ulb $ulb, Carbon $month): array
+    {
+        $workers = User::query()
+            ->where('role', 'worker')
+            ->where('ulb_id', $ulb->id)
+            ->orderBy('name')
+            ->get();
+
+        return $workers->map(fn (User $worker) => $this->buildForUserMonth($worker, $month))->all();
+    }
+
+    /**
+     * Download a single compiled PDF containing all workers in a ULB.
+     */
+    public function downloadUlbPdf(Ulb $ulb, Carbon $month, array $reports, string $filename)
+    {
+        return Pdf::loadView('reports.ulb-monthly-pdf', [
+            'reports'                => $reports,
+            'ulbName'                => $ulb->name,
+            'districtName'           => $ulb->district->name ?? '',
+            'monthLabel'             => $month->format('F Y'),
+            'metricLabels'           => self::metricLabels(),
+            'monthlyNarrativeLabels' => self::monthlyNarrativeLabels(),
+        ])->setPaper('a4')->download($filename);
+    }
+
+    /**
+     * Stream a single CSV containing all workers in a ULB.
+     */
+    public function streamUlbCsv(Ulb $ulb, Carbon $month, array $reports, string $filename)
+    {
+        $headers = [
+            'Content-Type'        => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+        ];
+
+        return Response::stream(function () use ($ulb, $month, $reports): void {
+            $handle = fopen('php://output', 'w');
+
+            // File header
+            fputcsv($handle, ['ULB Compiled Monthly Report']);
+            fputcsv($handle, ['ULB', $ulb->name]);
+            fputcsv($handle, ['District', $ulb->district->name ?? '']);
+            fputcsv($handle, ['Month', $month->format('F Y')]);
+            fputcsv($handle, ['Total Workers', count($reports)]);
+            fputcsv($handle, []);
+
+            // ── ULB-level aggregate totals ──────────────────────────────
+            $aggregate = array_fill_keys(array_keys(self::metricLabels()), 0);
+            foreach ($reports as $report) {
+                foreach (array_keys($aggregate) as $field) {
+                    $aggregate[$field] += $report['totals'][$field] ?? 0;
+                }
+            }
+
+            fputcsv($handle, ['=== ULB Aggregate Totals ===']);
+            fputcsv($handle, ['Particulars', 'Total']);
+            foreach (self::metricLabels() as $field => $label) {
+                fputcsv($handle, [$label, $aggregate[$field]]);
+            }
+            fputcsv($handle, []);
+
+            // ── Individual worker sections ──────────────────────────────
+            foreach ($reports as $report) {
+                fputcsv($handle, ['=== Worker: '.$report['user']->name.' ===']);
+                fputcsv($handle, ['District', $report['user']->district_name]);
+                fputcsv($handle, ['ULB', $report['user']->ulb_name]);
+                fputcsv($handle, ['Ward', $report['user']->assigned_ward ?: 'N/A']);
+                fputcsv($handle, ['Days Submitted', $report['submitted_days']]);
+                fputcsv($handle, []);
+
+                // Monthly narrative
+                fputcsv($handle, ['Monthly Progress Report']);
+                foreach (self::monthlyNarrativeLabels() as $field => $label) {
+                    fputcsv($handle, [$label, $report['monthly_narrative'][$field] ?: '']);
+                }
+                fputcsv($handle, []);
+
+                // Monthly totals
+                fputcsv($handle, ['Monthly Overview']);
+                fputcsv($handle, ['Particulars', 'Monthly Total']);
+                foreach (self::metricLabels() as $field => $label) {
+                    fputcsv($handle, [$label, $report['totals'][$field]]);
+                }
+                fputcsv($handle, []);
+
+                // Day-wise breakdown
+                fputcsv($handle, ['Day-wise Detailed Report']);
+                foreach ($report['activities'] as $activity) {
+                    fputcsv($handle, ['Date', $activity->activity_date->format('d M Y')]);
+                    fputcsv($handle, ['Remarks', $activity->remarks ?: 'No remarks added.']);
+                    fputcsv($handle, ['Proof Photos', $this->csvPhotoSummary($activity)]);
+                    fputcsv($handle, ['Particulars', 'Daily Value']);
+                    foreach (self::metricLabels() as $field => $label) {
+                        fputcsv($handle, [$label, (int) $activity->{$field}]);
+                    }
+                    fputcsv($handle, []);
+                }
+
+                fputcsv($handle, ['---']);
+                fputcsv($handle, []);
+            }
+
+            fclose($handle);
+        }, 200, $headers);
     }
 
     private function dailyWhatsappText(DailyActivity $activity): string

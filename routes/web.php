@@ -52,5 +52,7 @@ Route::middleware('auth')->group(function (): void {
         Route::get('/workers/{user}/reports/monthly', [AdminDashboardController::class, 'downloadWorkerMonthlyReport'])->name('workers.reports.monthly');
         Route::get('/workers/{user}/reports/monthly/pdf', [AdminDashboardController::class, 'downloadWorkerMonthlyPdfReport'])->name('workers.reports.monthly.pdf');
         Route::get('/workers/{user}/reports/monthly/share/whatsapp', [AdminDashboardController::class, 'shareWorkerMonthlyReportOnWhatsApp'])->name('workers.reports.monthly.whatsapp');
+        Route::get('/ulb/{ulb}/reports/monthly', [AdminDashboardController::class, 'downloadUlbMonthlyReport'])->name('ulb.reports.monthly');
+        Route::get('/ulb/{ulb}/reports/monthly/pdf', [AdminDashboardController::class, 'downloadUlbMonthlyPdfReport'])->name('ulb.reports.monthly.pdf');
     });
 });

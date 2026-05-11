@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\DailyActivity;
 use App\Models\District;
+use App\Models\Ulb;
 use App\Models\User;
 use App\Services\MonthlyReportService;
 use Carbon\Carbon;
@@ -143,6 +144,28 @@ class AdminDashboardController extends Controller
             'totalSubmissions' => $totalSubmissions,
             'recentActivities' => $recentActivities,
         ]);
+    }
+
+    public function downloadUlbMonthlyReport(Request $request, Ulb $ulb)
+    {
+        $ulb->load('district');
+        $month = $this->resolveMonth($request->query('month'));
+        $reports = $this->reports->buildForUlbMonth($ulb, $month);
+
+        $filename = $ulb->name.'-'.$month->format('Y-m').'-report.csv';
+
+        return $this->reports->streamUlbCsv($ulb, $month, $reports, $filename);
+    }
+
+    public function downloadUlbMonthlyPdfReport(Request $request, Ulb $ulb)
+    {
+        $ulb->load('district');
+        $month = $this->resolveMonth($request->query('month'));
+        $reports = $this->reports->buildForUlbMonth($ulb, $month);
+
+        $filename = $ulb->name.'-'.$month->format('Y-m').'-report.pdf';
+
+        return $this->reports->downloadUlbPdf($ulb, $month, $reports, $filename);
     }
 
     private function resolveMonth(?string $month): Carbon
