@@ -1,6 +1,48 @@
 @extends('layouts.app')
 
 @section('content')
+    <style>
+        .export-loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .loader-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+    </style>
+
+    <div id="exportLoader" class="export-loader-overlay">
+        <div class="spinner"></div>
+        <div class="loader-text">Generating Report...</div>
+        <p style="margin-top: 10px; opacity: 0.8; font-size: 0.9rem;">This may take a minute for large ULBs.</p>
+    </div>
+
     <!-- Admin Hero Section -->
     <div class="hero admin-hero" style="border:none; background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); color: white; padding: 40px; margin-bottom: 32px; box-shadow: var(--shadow-lg); overflow: hidden; position: relative;">
         <!-- Glassmorphism decorative element -->
@@ -157,8 +199,36 @@
                 ? opt.dataset.pdfUrl.replace('__MONTH__', month)
                 : opt.dataset.csvUrl.replace('__MONTH__', month);
 
+            showLoader();
             window.location.href = url;
         }
+
+        function showLoader() {
+            var loader = document.getElementById('exportLoader');
+            loader.style.display = 'flex';
+            
+            // Auto-hide loader when the window regains focus 
+            // (this happens after the browser starts the download)
+            window.addEventListener('focus', hideLoader, { once: true });
+            
+            // Backup hide after 15 seconds in case focus event doesn't fire
+            setTimeout(hideLoader, 15000);
+        }
+
+        function hideLoader() {
+            document.getElementById('exportLoader').style.display = 'none';
+        }
+
+        // Also add loader to individual download buttons in the table
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('a[title="Download PDF"], a.button-primary').forEach(function(btn) {
+                if (btn.innerText.trim() === 'Download' || btn.title === 'Download PDF') {
+                    btn.addEventListener('click', function() {
+                        showLoader();
+                    });
+                }
+            });
+        });
     </script>
 
     <!-- Main Data Split View -->
