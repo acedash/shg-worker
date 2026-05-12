@@ -94,7 +94,7 @@ class AdminDashboardController extends Controller
         return $this->reports->streamCsv(
             $this->reports->buildForUserMonth($user, $month),
             $user->name.'-'.$month->format('Y-m').'-report.csv'
-        )->withCookie(cookie('download_started', 'true', 1, null, null, false, false));
+        )->withCookie(cookie('download_started', 'true', 1, '/', null, false, false));
     }
 
     public function downloadWorkerMonthlyPdfReport(Request $request, User $user)
@@ -106,7 +106,7 @@ class AdminDashboardController extends Controller
         return $this->reports->downloadPdf(
             $this->reports->buildForUserMonth($user, $month),
             $user->name.'-'.$month->format('Y-m').'-report.pdf'
-        )->withCookie(cookie('download_started', 'true', 1, null, null, false, false));
+        )->withCookie(cookie('download_started', 'true', 1, '/', null, false, false));
     }
 
     public function showWorkerDailyReport(User $user, DailyActivity $activity)
@@ -156,7 +156,7 @@ class AdminDashboardController extends Controller
         $filename = $ulb->name.'-'.$month->format('Y-m').'-report.csv';
 
         return $this->reports->streamUlbCsv($ulb, $month, $reports, $filename)
-            ->withCookie(cookie('download_started', 'true', 1, null, null, false, false));
+            ->withCookie(cookie('download_started', 'true', 1, '/', null, false, false));
     }
 
     public function downloadUlbMonthlyPdfReport(Request $request, Ulb $ulb)
@@ -168,7 +168,7 @@ class AdminDashboardController extends Controller
         $filename = $ulb->name.'-'.$month->format('Y-m').'-report.pdf';
 
         return $this->reports->downloadUlbPdf($ulb, $month, $reports, $filename)
-            ->withCookie(cookie('download_started', 'true', 1, null, null, false, false));
+            ->withCookie(cookie('download_started', 'true', 1, '/', null, false, false));
     }
 
     public function downloadAllUlbsMonthlyReport(Request $request)
@@ -179,7 +179,7 @@ class AdminDashboardController extends Controller
         $filename = 'Global-Report-'.$month->format('Y-m').'.csv';
 
         return $this->reports->streamAllUlbsCsv($month, $reports, $filename)
-            ->withCookie(cookie('download_started', 'true', 1, null, null, false, false));
+            ->withCookie(cookie('download_started', 'true', 1, '/', null, false, false));
     }
 
     public function downloadAllUlbsMonthlyPdfReport(Request $request)
@@ -190,7 +190,7 @@ class AdminDashboardController extends Controller
         $filename = 'Global-Report-'.$month->format('Y-m').'.pdf';
 
         return $this->reports->downloadAllUlbsPdf($month, $reports, $filename)
-            ->withCookie(cookie('download_started', 'true', 1, null, null, false, false));
+            ->withCookie(cookie('download_started', 'true', 1, '/', null, false, false));
     }
 
     private function resolveMonth(?string $month): Carbon
