@@ -51,8 +51,10 @@ Route::middleware('auth')->group(function (): void {
         Route::get('/workers/{user}/reports/daily/{activity}', [AdminDashboardController::class, 'showWorkerDailyReport'])->name('workers.reports.daily');
         Route::get('/workers/{user}/reports/monthly', [AdminDashboardController::class, 'downloadWorkerMonthlyReport'])->name('workers.reports.monthly');
         Route::get('/workers/{user}/reports/monthly/pdf', [AdminDashboardController::class, 'downloadWorkerMonthlyPdfReport'])->name('workers.reports.monthly.pdf');
-        Route::get('/workers/{user}/reports/monthly/share/whatsapp', [AdminDashboardController::class, 'shareWorkerMonthlyReportOnWhatsApp'])->name('workers.reports.monthly.whatsapp');
+        Route::get('/workers/{user}/reports/monthly/share/whatsapp', [AdminDashboardController::class, 'shareWorkerMonthlyReportOnWhatsApp'])->name('workers.monthly.whatsapp');
         Route::get('/ulb/{ulb}/reports/monthly', [AdminDashboardController::class, 'downloadUlbMonthlyReport'])->name('ulb.reports.monthly');
         Route::get('/ulb/{ulb}/reports/monthly/pdf', [AdminDashboardController::class, 'downloadUlbMonthlyPdfReport'])->name('ulb.reports.monthly.pdf');
+        Route::get('/reports/all-ulbs/monthly', [AdminDashboardController::class, 'downloadAllUlbsMonthlyReport'])->name('all-ulbs.reports.monthly');
+        Route::get('/reports/all-ulbs/monthly/pdf', [AdminDashboardController::class, 'downloadAllUlbsMonthlyPdfReport'])->name('all-ulbs.reports.monthly.pdf');
     });
 });

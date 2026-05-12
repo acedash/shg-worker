@@ -70,7 +70,8 @@ class AdminDashboardController extends Controller
             'selectedMonth' => $selectedMonth,
             'workers' => $workers,
             'recentActivities' => $recentActivities,
-            'districts' => District::query()->with('ulbs')->orderBy('name')->get(),
+            'districts' => District::query()->with(['ulbs' => fn($q) => $q->orderBy('name')])->orderBy('name')->get(),
+            'allUlbs' => Ulb::query()->orderBy('name')->get(),
             'filters' => [
                 'q' => $search,
                 'district_id' => $districtId,
@@ -166,6 +167,26 @@ class AdminDashboardController extends Controller
         $filename = $ulb->name.'-'.$month->format('Y-m').'-report.pdf';
 
         return $this->reports->downloadUlbPdf($ulb, $month, $reports, $filename);
+    }
+
+    public function downloadAllUlbsMonthlyReport(Request $request)
+    {
+        $month = $this->resolveMonth($request->query('month'));
+        $reports = $this->reports->buildForAllUlbsMonth($month);
+
+        $filename = 'Global-Report-'.$month->format('Y-m').'.csv';
+
+        return $this->reports->streamAllUlbsCsv($month, $reports, $filename);
+    }
+
+    public function downloadAllUlbsMonthlyPdfReport(Request $request)
+    {
+        $month = $this->resolveMonth($request->query('month'));
+        $reports = $this->reports->buildForAllUlbsMonth($month);
+
+        $filename = 'Global-Report-'.$month->format('Y-m').'.pdf';
+
+        return $this->reports->downloadAllUlbsPdf($month, $reports, $filename);
     }
 
     private function resolveMonth(?string $month): Carbon

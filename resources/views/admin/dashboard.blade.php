@@ -90,14 +90,17 @@
                     <label style="font-size: 0.8rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em;">ULB <span style="color:#ef4444;">*</span></label>
                     <select id="export_ulb_id" style="background: #fff; border: 1px solid var(--line); padding: 10px 12px; border-radius: 12px; font-size: 0.92rem;">
                         <option value="">— Select a ULB —</option>
-                        @foreach ($districts as $district)
-                            @foreach ($district->ulbs as $ulb)
-                                <option value="{{ $ulb->id }}" data-district-id="{{ $district->id }}"
-                                    data-pdf-url="{{ route('admin.ulb.reports.monthly.pdf', ['ulb' => $ulb->id, 'month' => '__MONTH__']) }}"
-                                    data-csv-url="{{ route('admin.ulb.reports.monthly',     ['ulb' => $ulb->id, 'month' => '__MONTH__']) }}">
-                                    {{ $ulb->name }}
-                                </option>
-                            @endforeach
+                        <option value="all" 
+                            data-pdf-url="{{ route('admin.all-ulbs.reports.monthly.pdf', ['month' => '__MONTH__']) }}"
+                            data-csv-url="{{ route('admin.all-ulbs.reports.monthly',     ['month' => '__MONTH__']) }}">
+                            All ULBs (Global Report)
+                        </option>
+                        @foreach ($allUlbs as $ulb)
+                            <option value="{{ $ulb->id }}" data-district-id="{{ $ulb->district_id }}"
+                                data-pdf-url="{{ route('admin.ulb.reports.monthly.pdf', ['ulb' => $ulb->id, 'month' => '__MONTH__']) }}"
+                                data-csv-url="{{ route('admin.ulb.reports.monthly',     ['ulb' => $ulb->id, 'month' => '__MONTH__']) }}">
+                                {{ $ulb->name }}
+                            </option>
                         @endforeach
                     </select>
                 </div>
@@ -179,18 +182,52 @@
                     </select>
                     <select id="admin_ulb_id" name="ulb_id" style="min-width: 200px; background: #fff; border: 1px solid var(--line); padding: 10px 12px; border-radius: 12px; font-size: 0.92rem;">
                         <option value="">All ULBs</option>
-                        @foreach ($districts as $district)
-                            @foreach ($district->ulbs as $ulb)
-                                <option value="{{ $ulb->id }}" data-district-id="{{ $district->id }}" {{ (string) $filters['ulb_id'] === (string) $ulb->id ? 'selected' : '' }}>
-                                    {{ $ulb->name }}
-                                </option>
-                            @endforeach
+                        @foreach ($allUlbs as $ulb)
+                            <option value="{{ $ulb->id }}" data-district-id="{{ $ulb->district_id }}" {{ (string) $filters['ulb_id'] === (string) $ulb->id ? 'selected' : '' }}>
+                                {{ $ulb->name }}
+                            </option>
                         @endforeach
                     </select>
                     <button class="button button-primary" type="submit" style="min-height: 42px; padding: 10px 14px; font-size: 0.9rem;">Filter</button>
                     <a class="button button-secondary" href="{{ route('admin.dashboard', ['month' => $selectedMonth->format('Y-m')]) }}" style="min-height: 42px; padding: 10px 14px; font-size: 0.9rem;">Clear</a>
                 </form>
             </div>
+
+            {{-- ULB Export Bar: shown only when a specific ULB is filtered --}}
+            @if($filters['ulb_id'])
+                @php
+                    $selectedUlb = null;
+                    foreach ($districts as $d) {
+                        foreach ($d->ulbs as $u) {
+                            if ((string)$u->id === (string)$filters['ulb_id']) { $selectedUlb = $u; break 2; }
+                        }
+                    }
+                @endphp
+                @if($selectedUlb)
+                <div style="padding: 14px 24px; background: #eef2ff; border-bottom: 1px solid #c7d2fe; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <svg style="width:18px; height:18px; color: #4f46e5; flex-shrink:0;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+                        <span style="font-weight: 600; color: #3730a3; font-size: 0.95rem;">
+                            Export compiled report for <strong>{{ $selectedUlb->name }}</strong> — {{ $selectedMonth->format('F Y') }}
+                        </span>
+                    </div>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <a href="{{ route('admin.ulb.reports.monthly.pdf', ['ulb' => $selectedUlb->id, 'month' => $selectedMonth->format('Y-m')]) }}"
+                           class="button"
+                           style="display:inline-flex; align-items:center; gap:7px; padding: 9px 18px; background: #ef4444; color: #fff; border-radius: 10px; font-weight: 600; font-size: 0.88rem; text-decoration:none; border:none;">
+                            <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6M9 9h1"/></svg>
+                            Download PDF
+                        </a>
+                        <a href="{{ route('admin.ulb.reports.monthly', ['ulb' => $selectedUlb->id, 'month' => $selectedMonth->format('Y-m')]) }}"
+                           class="button"
+                           style="display:inline-flex; align-items:center; gap:7px; padding: 9px 18px; background: #16a34a; color: #fff; border-radius: 10px; font-weight: 600; font-size: 0.88rem; text-decoration:none; border:none;">
+                            <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M16 12l-4 4-4-4M12 3v13"/></svg>
+                            Download Excel
+                        </a>
+                    </div>
+                </div>
+                @endif
+            @endif
 
             <div style="overflow-x: auto;">
                 <table style="width: 100%; border-collapse: separate; border-spacing: 0;">
@@ -227,7 +264,7 @@
                                         <a class="button button-secondary button-icon" style="padding: 8px; border-radius: 10px;" href="{{ route('admin.workers.profile', $worker->id) }}" title="View Profile">
                                             <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
                                         </a>
-                                        <a class="button button-secondary button-icon" style="padding: 8px; border-radius: 10px;" href="{{ route('admin.workers.reports.monthly.whatsapp', ['user' => $worker->id, 'month' => $selectedMonth->format('Y-m')]) }}" title="Share via WhatsApp">
+                                        <a class="button button-secondary button-icon" style="padding: 8px; border-radius: 10px;" href="{{ route('admin.workers.monthly.whatsapp', ['user' => $worker->id, 'month' => $selectedMonth->format('Y-m')]) }}" title="Share via WhatsApp">
                                             <svg style="color: #25D366;" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 01-11.7 7.1L4 20l1-4.1A8 8 0 1120 12z" /></svg>
                                         </a>
                                         <a class="button button-secondary button-icon" style="padding: 8px; border-radius: 10px;" href="{{ route('admin.workers.reports.monthly.pdf', ['user' => $worker->id, 'month' => $selectedMonth->format('Y-m')]) }}" title="Download PDF">
