@@ -348,7 +348,8 @@ class MonthlyReportService
             'monthLabel'             => $month->format('F Y'),
             'metricLabels'           => self::metricLabels(),
             'monthlyNarrativeLabels' => self::monthlyNarrativeLabels(),
-        ])->setPaper('a4')->download($filename);
+            'isGlobal'               => true,
+        ])->setPaper('a4', 'landscape')->download($filename);
     }
 
     /**

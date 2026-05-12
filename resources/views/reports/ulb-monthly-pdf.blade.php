@@ -55,6 +55,38 @@
     @if(count($reports) === 0)
         <div class="page-break"></div>
         <div class="no-workers">No worker data found for this ULB in {{ $monthLabel }}.</div>
+    @elseif(isset($isGlobal) && $isGlobal)
+        {{-- ── Global Summary Table ── --}}
+        <div class="page-break"></div>
+        <h2 style="margin-bottom: 20px; color: #4f46e5;">Worker Performance Summary – {{ $monthLabel }}</h2>
+        <table class="data-table" style="font-size: 10px;">
+            <thead>
+                <tr>
+                    <th style="width: 120px;">Worker Name</th>
+                    <th>ULB</th>
+                    <th style="width: 40px; text-align:center;">Days</th>
+                    @foreach($metricLabels as $field => $label)
+                        <th style="font-size: 8px; text-align: center;">{{ explode(' ', $label)[2] ?? substr($label, 0, 8) }}</th>
+                    @endforeach
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($reports as $report)
+                    <tr>
+                        <td><strong>{{ $report['user']->name }}</strong></td>
+                        <td>{{ $report['user']->ulb_name }}</td>
+                        <td style="text-align:center;">{{ $report['submitted_days'] }}</td>
+                        @foreach($metricLabels as $field => $label)
+                            <td style="text-align: center;">{{ $report['totals'][$field] }}</td>
+                        @endforeach
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+
+        <div style="margin-top: 40px; font-size: 11px; color: #6b7280;">
+            <p>* Full day-wise logs and narrative answers are available in the CSV export or individual worker PDFs.</p>
+        </div>
     @else
         @foreach($reports as $report)
             <div class="page-break"></div>

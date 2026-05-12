@@ -204,23 +204,34 @@
         }
 
         function showLoader() {
-            var loader = document.getElementById('exportLoader');
-            loader.style.display = 'flex';
+            document.getElementById('exportLoader').style.display = 'flex';
             
-            // Auto-hide loader when the window regains focus 
-            // (this happens after the browser starts the download)
-            window.addEventListener('focus', hideLoader, { once: true });
-            
-            // Backup hide after 15 seconds in case focus event doesn't fire
-            setTimeout(hideLoader, 15000);
+            // Delete existing cookie if any
+            document.cookie = "download_started=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+            // Start polling for the cookie
+            var checkInterval = setInterval(function() {
+                if (document.cookie.indexOf("download_started=true") !== -1) {
+                    clearInterval(checkInterval);
+                    hideLoader();
+                    // Clean up the cookie
+                    document.cookie = "download_started=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                }
+            }, 500);
+
+            // Safety timeout: 120 seconds
+            setTimeout(function() {
+                clearInterval(checkInterval);
+                hideLoader();
+            }, 120000);
         }
 
         function hideLoader() {
             document.getElementById('exportLoader').style.display = 'none';
         }
 
-        // Also add loader to individual download buttons in the table
         document.addEventListener('DOMContentLoaded', function() {
+            // Monitor individual worker download buttons
             document.querySelectorAll('a[title="Download PDF"], a.button-primary').forEach(function(btn) {
                 if (btn.innerText.trim() === 'Download' || btn.title === 'Download PDF') {
                     btn.addEventListener('click', function() {
