@@ -271,6 +271,10 @@
                     </select>
                     <button class="button button-primary" type="submit" style="min-height: 42px; padding: 10px 14px; font-size: 0.9rem;">Filter</button>
                     <a class="button button-secondary" href="{{ route('admin.dashboard', ['month' => $selectedMonth->format('Y-m')]) }}" style="min-height: 42px; padding: 10px 14px; font-size: 0.9rem;">Clear</a>
+                    <button type="submit" formaction="{{ route('admin.users.export') }}" class="button" style="min-height: 42px; padding: 10px 14px; font-size: 0.9rem; display:inline-flex; align-items:center; gap:6px; background:#10b981; color:#fff; border:none; border-radius:12px; font-weight:600; cursor:pointer;">
+                        <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M16 12l-4 4-4-4M12 3v13"/></svg>
+                        Export Users
+                    </button>
                 </form>
             </div>
 

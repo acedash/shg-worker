@@ -189,6 +189,71 @@ class AdminDashboardController extends Controller
         return $this->reports->downloadAllUlbsPdf($month, $reports, $filename);
     }
 
+    public function exportUsersCsv(Request $request)
+    {
+        $search = trim((string) $request->query('q', ''));
+        $districtId = $request->query('district_id');
+        $ulbId = $request->query('ulb_id');
+
+        $users = User::query()
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($inner) use ($search) {
+                    $inner->where('name', 'like', '%'.$search.'%')
+                        ->orWhere('email', 'like', '%'.$search.'%')
+                        ->orWhere('phone', 'like', '%'.$search.'%');
+                });
+            })
+            ->when($districtId, fn ($query) => $query->where('district_id', $districtId))
+            ->when($ulbId, fn ($query) => $query->where('ulb_id', $ulbId))
+            ->orderBy('id')
+            ->get();
+
+        $filename = 'registered_users_' . now()->format('Ymd_His') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"$filename\"",
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
+        ];
+
+        $callback = function () use ($users) {
+            $file = fopen('php://output', 'w');
+            
+            // Header row
+            fputcsv($file, [
+                'ID',
+                'Name',
+                'Phone',
+                'Email',
+                'Role',
+                'Assigned Ward',
+                'District',
+                'ULB',
+                'Registered At'
+            ]);
+
+            foreach ($users as $user) {
+                fputcsv($file, [
+                    $user->id,
+                    $user->name,
+                    $user->phone,
+                    $user->email,
+                    $user->role,
+                    $user->assigned_ward,
+                    $user->district_name,
+                    $user->ulb_name,
+                    $user->created_at ? $user->created_at->format('Y-m-d H:i:s') : '',
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
     private function resolveMonth(?string $month): Carbon
     {
         return $month
