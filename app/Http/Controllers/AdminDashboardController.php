@@ -254,6 +254,15 @@ class AdminDashboardController extends Controller
         return response()->stream($callback, 200, $headers);
     }
 
+    public function destroyUser(User $user)
+    {
+        abort_if($user->isAdmin(), 403, 'Cannot delete admin users.');
+
+        $user->delete();
+
+        return redirect()->back()->with('status', 'User deleted successfully.');
+    }
+
     private function resolveMonth(?string $month): Carbon
     {
         return $month

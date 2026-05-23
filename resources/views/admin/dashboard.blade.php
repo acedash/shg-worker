@@ -356,6 +356,13 @@
                                             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14" /></svg>
                                         </a>
                                         <a class="button button-primary" style="padding: 8px 16px; font-size: 0.85rem; border-radius: 10px;" href="{{ route('admin.workers.reports.monthly', ['user' => $worker->id, 'month' => $selectedMonth->format('Y-m')]) }}">Download</a>
+                                        <form action="{{ route('admin.users.destroy', $worker->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this user?');" style="display:inline;">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="button button-secondary button-icon" style="padding: 8px; border-radius: 10px; color: #ef4444;" title="Delete User">
+                                                <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                            </button>
+                                        </form>
                                     </div>
                                 </td>
                             </tr>

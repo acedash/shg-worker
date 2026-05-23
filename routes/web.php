@@ -57,5 +57,6 @@ Route::middleware('auth')->group(function (): void {
         Route::get('/reports/all-ulbs/monthly', [AdminDashboardController::class, 'downloadAllUlbsMonthlyReport'])->name('all-ulbs.reports.monthly');
         Route::get('/reports/all-ulbs/monthly/pdf', [AdminDashboardController::class, 'downloadAllUlbsMonthlyPdfReport'])->name('all-ulbs.reports.monthly.pdf');
         Route::get('/users/export', [AdminDashboardController::class, 'exportUsersCsv'])->name('users.export');
+        Route::delete('/users/{user}', [AdminDashboardController::class, 'destroyUser'])->name('users.destroy');
     });
 });
