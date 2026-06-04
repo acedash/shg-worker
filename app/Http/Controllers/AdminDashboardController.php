@@ -147,6 +147,21 @@ class AdminDashboardController extends Controller
         ]);
     }
 
+    public function updateUserPassword(Request $request, User $user)
+    {
+        abort_if($user->isAdmin(), 404);
+
+        $request->validate([
+            'password' => 'required|min:6|confirmed',
+        ]);
+
+        $user->update([
+            'password' => \Illuminate\Support\Facades\Hash::make($request->password),
+        ]);
+
+        return redirect()->back()->with('status', 'Password updated successfully.');
+    }
+
     public function downloadUlbMonthlyReport(Request $request, Ulb $ulb)
     {
         $ulb->load('district');

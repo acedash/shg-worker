@@ -76,6 +76,36 @@
                 </div>
             </div>
 
+            <!-- Change Password Card -->
+            <div class="card" style="padding: 24px;">
+                <h3 style="margin: 0 0 20px; font-size: 1.1rem; display: flex; align-items: center; gap: 10px;">
+                    <svg style="width: 20px; height: 20px; color: var(--brand);" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                    Change Password
+                </h3>
+                <form action="{{ route('admin.workers.password.update', $worker->id) }}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <div class="grid grid-2" style="gap: 20px;">
+                        <div>
+                            <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text); margin-bottom: 8px;">New Password</label>
+                            <input type="password" name="password" required minlength="6" style="width: 100%; padding: 10px 14px; border: 1px solid var(--line); border-radius: 10px; background: #fff;">
+                            @error('password')
+                                <div style="color: #ef4444; font-size: 0.8rem; margin-top: 4px;">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text); margin-bottom: 8px;">Confirm Password</label>
+                            <input type="password" name="password_confirmation" required minlength="6" style="width: 100%; padding: 10px 14px; border: 1px solid var(--line); border-radius: 10px; background: #fff;">
+                        </div>
+                    </div>
+                    <div style="margin-top: 20px; text-align: right;">
+                        <button type="submit" class="button button-primary" style="padding: 10px 20px;">Update Password</button>
+                    </div>
+                </form>
+            </div>
+
             <!-- Recent Activity -->
             <div class="card" style="padding: 0; overflow: hidden;">
                 <div style="padding: 24px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center;">

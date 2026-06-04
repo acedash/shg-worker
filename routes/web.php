@@ -48,6 +48,7 @@ Route::middleware('auth')->group(function (): void {
     Route::middleware('admin')->prefix('admin')->name('admin.')->group(function (): void {
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
         Route::get('/workers/{user}/profile', [AdminDashboardController::class, 'showWorkerProfile'])->name('workers.profile');
+        Route::put('/workers/{user}/password', [AdminDashboardController::class, 'updateUserPassword'])->name('workers.password.update');
         Route::get('/workers/{user}/reports/daily/{activity}', [AdminDashboardController::class, 'showWorkerDailyReport'])->name('workers.reports.daily');
         Route::get('/workers/{user}/reports/monthly', [AdminDashboardController::class, 'downloadWorkerMonthlyReport'])->name('workers.reports.monthly');
         Route::get('/workers/{user}/reports/monthly/pdf', [AdminDashboardController::class, 'downloadWorkerMonthlyPdfReport'])->name('workers.reports.monthly.pdf');
