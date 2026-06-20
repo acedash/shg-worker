@@ -22,6 +22,8 @@ class DailyActivity extends Model
         'swm_assets_visited',
         'households_started_segregation',
         'households_started_home_composting',
+        'households_motivated_composting',
+        'households_started_composting',
         'open_burning_issues_found',
         'gvp_points_found',
         'cd_waste_points_found',

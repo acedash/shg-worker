@@ -23,6 +23,8 @@ class MonthlyReportService
             'transit_locations_visited' => 'No. of Transit Location (Bus Stand/ Taxi Stand/ Railway Station) Visited',
             'toilets_visited' => 'No. of CT/PT/Aspirational Toilets Visited',
             'swm_assets_visited' => 'No. of SWM Assets (Twin Bins, Compost Pit, Transfer Station) visited',
+            'households_motivated_composting' => 'No. Of households motivated for composting',
+            'households_started_composting' => 'No. Of household started composting',
             'open_burning_issues_found' => 'No. of Open Burning of Garbage Points Found',
             'gvp_points_found' => 'No. of Garbage Vulnerable Points (GVP) Found',
             'cd_waste_points_found' => 'No. of C&D Waste Points Found',
@@ -40,6 +42,8 @@ class MonthlyReportService
             'Household & Shops' => [
                 'households_visited',
                 'commercial_shops_visited',
+                'households_motivated_composting',
+                'households_started_composting',
             ],
             'Institution & Bulk Waste Generators (BWG)' => [
                 'institutions_visited',
