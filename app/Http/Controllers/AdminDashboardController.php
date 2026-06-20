@@ -220,6 +220,8 @@ class AdminDashboardController extends Controller
             })
             ->when($districtId, fn ($query) => $query->where('district_id', $districtId))
             ->when($ulbId, fn ($query) => $query->where('ulb_id', $ulbId))
+            ->withSum('dailyActivities', 'households_motivated_composting')
+            ->withSum('dailyActivities', 'households_started_composting')
             ->orderBy('id')
             ->get();
 
@@ -246,7 +248,9 @@ class AdminDashboardController extends Controller
                 'Assigned Ward',
                 'District',
                 'ULB',
-                'Registered At'
+                'Registered At',
+                'Households Motivated Composting',
+                'Households Started Composting'
             ]);
 
             foreach ($users as $user) {
@@ -260,6 +264,8 @@ class AdminDashboardController extends Controller
                     $user->district_name,
                     $user->ulb_name,
                     $user->created_at ? $user->created_at->format('Y-m-d H:i:s') : '',
+                    $user->daily_activities_sum_households_motivated_composting ?? 0,
+                    $user->daily_activities_sum_households_started_composting ?? 0,
                 ]);
             }
 
