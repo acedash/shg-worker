@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('daily_activities', function (Blueprint $table) {
-            $table->integer('households_motivated_composting')->nullable()->after('wet_waste_collected');
+            $table->integer('households_motivated_composting')->nullable()->after('households_started_home_composting');
             $table->integer('households_started_composting')->nullable()->after('households_motivated_composting');
         });
     }
